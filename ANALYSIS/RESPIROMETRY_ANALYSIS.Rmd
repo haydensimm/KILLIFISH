@@ -1,11 +1,9 @@
 ---
-title: "Respirometry Analysis Script"
+title: "Respirometry Analysis "
 author: "Hayden Simm"
-date: "2026-01-20"
+date: "2026-02-28"
 output: html_document
 ---
-
-JD: It's hard to be sure what's new here. Maybe better to respond to Ben back in Assignment 2, and start this assignment by reading an .rds file. You can also use the README to tell us how things go together.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -21,10 +19,14 @@ suppressPackageStartupMessages(
   )
 ```
 
-creating the dataframe
+creating the dataframeS
 ```{r}
-df_respirometry_acclimation <- read.delim("KILLIFISH_RESPIROMETRY_2_ACCLIMATION.txt")
-df_respirometry_opposite <- read.delim("KILLIFISH_RESPIROMETRY_2_OPPOSITE.txt")
+#GROUP1
+df_killifish_respirometry_acclimation_group1 <- read_delim("KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
+df_background_respirometry_acclimation_group1 <- read_delim("KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
+df_killifish_respirometry_opposite_group1 <- read_delim("KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP1.txt")
+df_background_respirometry_opposite_group1 <- read_delim("KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP1.txt")
+
 ```
 **BMB**: is there any way you can get these data in a saner format?
 **response**: the software used to collect this info is called "pyroscience" 
