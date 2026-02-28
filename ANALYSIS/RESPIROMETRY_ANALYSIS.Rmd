@@ -17,16 +17,36 @@ suppressPackageStartupMessages(
 suppressPackageStartupMessages(
   library(respR)
   )
+library(readr)
 ```
 
 creating the dataframeS
 ```{r}
 #GROUP1
-df_killifish_respirometry_acclimation_group1 <- read_delim("KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
-df_background_respirometry_acclimation_group1 <- read_delim("KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
-df_killifish_respirometry_opposite_group1 <- read_delim("KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP1.txt")
-df_background_respirometry_opposite_group1 <- read_delim("KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP1.txt")
-
+df_killifish_respirometry_acclimation_group1 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
+df_background_respirometry_acclimation_group1 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
+df_killifish_respirometry_opposite_group1 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP1.txt")
+df_background_respirometry_opposite_group1 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP1.txt")
+#GROUP2
+df_killifish_respirometry_acclimation_group2 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP2.txt")
+df_background_respirometry_acclimation_group2 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP2.txt")
+df_killifish_respirometry_opposite_group2 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP2.txt")
+df_background_respirometry_opposite_group2 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP2.txt")
+#GROUP3
+df_killifish_respirometry_acclimation_group3 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP3.txt")
+df_background_respirometry_acclimation_group3 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP3.txt")
+df_killifish_respirometry_opposite_group3 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP3.txt")
+df_background_respirometry_opposite_group3 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP3.txt")
+#GROUP4
+df_killifish_respirometry_acclimation_group4 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP4.txt")
+df_background_respirometry_acclimation_group4 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP4.txt")
+df_killifish_respirometry_opposite_group4 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP4.txt")
+df_background_respirometry_opposite_group4 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP4.txt")
+#GROUP5
+df_killifish_respirometry_acclimation_group5 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
+df_background_respirometry_acclimation_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
+df_killifish_respirometry_opposite_group5 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP5.txt")
+df_background_respirometry_opposite_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP5.txt")
 ```
 **BMB**: is there any way you can get these data in a saner format?
 **response**: the software used to collect this info is called "pyroscience" 
