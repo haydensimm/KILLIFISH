@@ -48,24 +48,50 @@ df_background_respirometry_acclimation_group5 <- read_delim("../DATA/BACKGROUND_
 df_killifish_respirometry_opposite_group5 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP5.txt")
 df_background_respirometry_opposite_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP5.txt")
 ```
-**BMB**: is there any way you can get these data in a saner format?
-**response**: the software used to collect this info is called "pyroscience" 
-  and the file outputs are supposed to be their own file types ".pyr", so yes 
-  it is a mess and part of the reason I'm here!
+
+Creating a list of all dataframes
+```{r}
+dfs<-list(
+  df_killifish_respirometry_acclimation_group1,
+  df_background_respirometry_acclimation_group1,
+  df_killifish_respirometry_opposite_group1,
+  df_background_respirometry_opposite_group1,
+  df_killifish_respirometry_acclimation_group2,
+  df_background_respirometry_acclimation_group2,
+  df_killifish_respirometry_opposite_group2,
+  df_background_respirometry_opposite_group2,
+  df_killifish_respirometry_acclimation_group3,
+  df_background_respirometry_acclimation_group3,
+  df_killifish_respirometry_opposite_group3,
+  df_background_respirometry_opposite_group3,
+  df_killifish_respirometry_acclimation_group4,
+  df_background_respirometry_acclimation_group4,
+  df_killifish_respirometry_opposite_group4,
+  df_background_respirometry_opposite_group4,
+  df_killifish_respirometry_acclimation_group5,
+  df_background_respirometry_acclimation_group5,
+  df_killifish_respirometry_opposite_group5,
+  df_background_respirometry_opposite_group5
+)
+```
 
 Removing rows by a row name in the software instead of manually
 ```{r}
-start_row_acclimation <- which(apply(df_respirometry_acclimation, 1, 
-  function(x) any(x == "#--- Measurement Data --------------------------------------------------------------------"))) 
-df_respirometry_acclimation <- df_respirometry_acclimation[(start_row_acclimation + 1):nrow(df_respirometry_acclimation), ]
-colnames(df_respirometry_acclimation) <- df_respirometry_acclimation[1, ]
-df_respirometry_acclimation <- df_respirometry_acclimation [-1,]
-
-start_row_opposite <- which(apply(df_respirometry_opposite, 1, 
-  function(x) any(x == "#--- Measurement Data --------------------------------------------------------------------"))) 
-df_respirometry_opposite <- df_respirometry_opposite[(start_row_opposite + 1):nrow(df_respirometry_opposite), ]
-colnames(df_respirometry_opposite) <- df_respirometry_opposite[1, ]
-df_respirometry_opposite <- df_respirometry_opposite [-1,]
+clean_respirometry_df <- function(df, marker = "#--- Measurement Data --------------------------------------------------------------------") {
+  # Find the row with the marker
+  start_row <- which(apply(df, 1, function(x) any(x == marker)))
+  
+  # Keep all rows below the marker
+  df <- df[(start_row + 1):nrow(df), ]
+  
+  # Set the first row as column names
+  colnames(df) <- df[1, ]
+  
+  # Remove the first row (now headers)
+  df <- df[-1, ]
+  
+  return(df)
+}
 ```
 
 Setting up a function to process the dataframes for both acclimation and opposite
