@@ -28,17 +28,53 @@ df_killifish_respirometry_acclimation_group1 <- read_delim("../DATA/KILLIFISH_RE
 df_background_respirometry_acclimation_group1 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
 df_killifish_respirometry_opposite_group1 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP1.txt")
 df_background_respirometry_opposite_group1 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP1.txt")
+#GROUP2
+df_killifish_respirometry_acclimation_group2 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP2.txt")
+df_background_respirometry_acclimation_group2 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP2.txt")
+df_killifish_respirometry_opposite_group2 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP2.txt")
+df_background_respirometry_opposite_group2 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP2.txt")
+#GROUP3
+df_killifish_respirometry_acclimation_group3 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP3.txt")
+df_background_respirometry_acclimation_group3 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP3.txt")
+df_killifish_respirometry_opposite_group3 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP3.txt")
+df_background_respirometry_opposite_group3 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP3.txt")
+#GROUP4
+df_killifish_respirometry_acclimation_group4 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP4.txt")
+df_background_respirometry_acclimation_group4 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP4.txt")
+df_killifish_respirometry_opposite_group4 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP4.txt")
+df_background_respirometry_opposite_group4 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP4.txt")
+#GROUP5
+df_killifish_respirometry_acclimation_group5 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
+df_background_respirometry_acclimation_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
+df_killifish_respirometry_opposite_group5 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP5.txt")
+df_background_respirometry_opposite_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP5.txt")
   })
 )
 ```
 
 Creating a list of all dataframes
 ```{r}
-dfs_group1<-list(
+dfs<-list(
   df_killifish_respirometry_acclimation_group1,
   df_background_respirometry_acclimation_group1,
   df_killifish_respirometry_opposite_group1,
-  df_background_respirometry_opposite_group1
+  df_background_respirometry_opposite_group1,
+  df_killifish_respirometry_acclimation_group2,
+  df_background_respirometry_acclimation_group2,
+  df_killifish_respirometry_opposite_group2,
+  df_background_respirometry_opposite_group2,
+  df_killifish_respirometry_acclimation_group3,
+  df_background_respirometry_acclimation_group3,
+  df_killifish_respirometry_opposite_group3,
+  df_background_respirometry_opposite_group3,
+  df_killifish_respirometry_acclimation_group4,
+  df_background_respirometry_acclimation_group4,
+  df_killifish_respirometry_opposite_group4,
+  df_background_respirometry_opposite_group4,
+  df_killifish_respirometry_acclimation_group5,
+  df_background_respirometry_acclimation_group5,
+  df_killifish_respirometry_opposite_group5,
+  df_background_respirometry_opposite_group5
 )
 ```
 
@@ -51,17 +87,26 @@ remove_rows <- function(df, marker = "#--- Measurement Data --------------------
   # Keep only rows below the marker
   df <- df[(start_row + 1):nrow(df), ]
   
+  # Set the first row as column names
+  colnames(df) <- df[1, ]
+  
+  # Remove the first row (now headers)
+  df <- df[-1, ]
+  
+  # Optional: convert numeric columns automatically
+  #df[] <- lapply(df, function(x) type.convert(as.character(x), as.is = TRUE))
+  
   return(df)
 }
 ```
 
-Function to select the appropriate columns for analysis by position
+applying the function
 ```{r}
-select_columns <- function(df) {
-  df[, c(3, 4, 22, 40, 58, 81, 99, 117, 135)]
-}
+dfs_remove_rows <- lapply(dfs, remove_rows)
 ```
-*note from the author* Alternatively, I attemtped to use a function to select columns by the name in the pyroscience software but unfortunately some runs contained NA where the following titles should have been. Following this I have renamed the columns as they should appear below.
+
+Setting up a function to select the appropriate columns for analysis
+```{r}
 select_columns <- function(df) {
   df %>%
     select(
@@ -79,47 +124,17 @@ select_columns <- function(df) {
     mutate(across(everything(), as.numeric)) %>%
     drop_na()
   }
-
-Renaming columns by what they could/should be in the raw data
-```{r}
-rename_and_clean <- function(df) {
-  
-  # Check that there are 9 columns
-  if (ncol(df) != 9) {
-    stop("Dataframe does not have 9 columns.")
-  }
-  
-  colnames(df) <- c(
-    "dt (s) [A Ch.1 Main]",
-    "Oxygen (%air sat.) [A Ch.1 Main]",
-    "Oxygen (%air sat.) [A Ch.2 Main]",
-    "Oxygen (%air sat.) [A Ch.3 Main]",
-    "Oxygen (%air sat.) [A Ch.4 Main]",
-    "Oxygen (%air sat.) [B Ch.1 Main]",
-    "Oxygen (%air sat.) [B Ch.2 Main]",
-    "Oxygen (%air sat.) [B Ch.3 Main]",
-    "Oxygen (%air sat.) [B Ch.4 Main]"
-  )
-  
-  df %>%
-    janitor::clean_names(case = "snake") %>%
-    mutate(across(everything(), as.numeric)) %>%
-    drop_na()
-}
 ```
 
 
+Running the function
 ```{r}
-process_functions <- function(df) {
-  df %>%
-    remove_rows() %>%
-    select(3,4,22,40,58,81,99,117,135) %>%
-    rename_and_clean()
-}
-
-dfs_processed_group1 <- lapply(dfs_group1, process_functions)
+df_respirometry_acclimation <- process_respirometry_df(df_respirometry_acclimation)
+df_respirometry_opposite <- process_respirometry_df(df_respirometry_opposite)
 ```
 
+**Note**: I recognize that have each of the following respR functions separate is redundant when I could define it as a function and run it repeatedly like above. However the individual variance between chambers makes this tricky because the "weight", start", "wait" and "measure" times all slightly differ so I decided to do this manually. 
+**as well**: to respond to a comment from assignment 2, I agree that the automation of this calculation is tricky. The historical way of process data this was to literally take the slope by hand from the raw file. Our lab is experimenting with trying to use this Rpackage "respR" instead, and I have intentionally chosen this data to bring to class to get the opportunity to play with the data and see if it is something worth using. 
 ```{r}
 A1_acclimation<-df_respirometry_acclimation %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_1_main") %>%
