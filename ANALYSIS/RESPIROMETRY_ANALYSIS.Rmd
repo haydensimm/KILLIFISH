@@ -32,14 +32,14 @@ df_background_respirometry_opposite_group1 <- read_delim("../DATA/BACKGROUND_RES
 )
 ```
 
-Creating a list of all dataframes
+Creating a list of all data frames, preserving the orignal names 
 ```{r}
-dfs_group1<-list(
-  df_killifish_respirometry_acclimation_group1,
-  df_background_respirometry_acclimation_group1,
-  df_killifish_respirometry_opposite_group1,
-  df_background_respirometry_opposite_group1
-)
+dfs_group1 <- mget(c(
+  "df_killifish_respirometry_acclimation_group1",
+  "df_background_respirometry_acclimation_group1",
+  "df_killifish_respirometry_opposite_group1",
+  "df_background_respirometry_opposite_group1"
+))
 ```
 
 Function for removing rows that include device information
@@ -54,14 +54,7 @@ remove_rows <- function(df, marker = "#--- Measurement Data --------------------
   return(df)
 }
 ```
-
-Function to select the appropriate columns for analysis by position
-```{r}
-select_columns <- function(df) {
-  df[, c(3, 4, 22, 40, 58, 81, 99, 117, 135)]
-}
-```
-*note from the author* Alternatively, I attemtped to use a function to select columns by the name in the pyroscience software but unfortunately some runs contained NA where the following titles should have been. Following this I have renamed the columns as they should appear below.
+*note from the author* Alternatively, I attempted to use a function to select columns by the name in the pyroscience software but unfortunately some runs contained NA where the following titles should have been. Following this I have renamed the columns as they should appear below.
 select_columns <- function(df) {
   df %>%
     select(
@@ -120,18 +113,22 @@ process_functions <- function(df) {
 dfs_processed_group1 <- lapply(dfs_group1, process_functions)
 ```
 
+This is an optional step I recommend removing the original list because of its large size
 ```{r}
-A1_acclimation<-df_respirometry_acclimation %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_1_main") %>%
-  na.omit() %>%
+rm(dfs_group1)
+```
+
+```{r}
+fish6_acclimation <- dfs_processed_group1[["df_killifish_respirometry_acclimation_group1"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_3_main") %>%
   inspect(time = 1, oxygen = 2, plot = FALSE) %>%
-  subset_data(from = 30000, to = 40000, by = "time") %>% #subset to after MMR and middle of night 
+  subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
   auto_rate.int(start = 600, #time that flush pump is on, in seconds
                 wait = 200, 
-                measure = 300, #wait + measure times should add to time that flush pump is off
-                method = "linear", width = 75, by = "time") %>%
+                measure = 280, #wait + measure times should add to time that flush pump is off
+                method = "linear", width = 150, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 28, t = 10, mass = 0.006843) %>%
+               volume = 0.175, S = 28, t = 10, mass = 0.006932) %>%
   #plot(pos =10) %>%
   #summary(pos =10) %>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
@@ -139,3 +136,78 @@ A1_acclimation<-df_respirometry_acclimation %>%
   mean() %>% #this is your final value
   summary(export = TRUE)
 ```
+
+```{r}
+fish5_opposite <- dfs_processed_group1[["df_killifish_respirometry_opposite_group1"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_2_main") %>%
+  inspect(time = 1, oxygen = 2, plot = FALSE) %>%
+  subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
+  auto_rate.int(start = 240, #time that flush pump is on, in seconds
+                wait = 90, 
+                measure = 90, #wait + measure times should add to time that flush pump is off
+                method = "linear", width = 50, by = "time") %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 28, t = 24, mass = 0.006932) %>%
+  #plot(pos =10) %>%
+  #summary(pos =10) %>% this is to specifically look at specific replicates
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "lowest_percentile", n = 0.1) %>%
+  mean() %>% #this is your final value
+  summary(export = TRUE)
+```
+
+
+```{r}
+calculate_rmr <- function(df, volume, salinity, temp, mass,) {
+  
+  df %>%
+    select(dt_s_a_ch_1_main, oxygen_percent_air_sat_a_ch_2_main) %>%
+    inspect(time = 1, oxygen = 2, plot = FALSE) %>%
+    subset_data(from = 30000, to = 40000, by = "time") %>%
+    auto_rate.int(start = 600,
+                  wait = 200,
+                  measure = 300,
+                  method = "linear",
+                  width = 75,
+                  by = "time") %>%
+    convert_rate(
+      oxy.unit = "%Air",
+      time.unit = "s",
+      output.unit = "umol/min/g",
+      volume = volume,
+      S = salinity,
+      t = temp,
+      mass = mass
+    ) %>%
+    select_rate(method = "rsq", n = c(0.9, 1)) %>%
+    select_rate(method = "lowest_percentile", n = 0.1) %>%
+    mean() %>%
+    summary(export = TRUE)
+}
+```
+
+```{r}
+process_dataframe <- function(df, metadata_df) {
+
+  time_col <- df$dt_s_a_ch_1_main
+  
+  oxygen_cols <- grep("^oxygen", colnames(df), value = TRUE)
+
+  results <- lapply(oxygen_cols, function(fish_col) {
+
+    single_df <- data.frame(
+      time = time_col,
+      oxygen = df[[fish_col]]
+    )
+
+    meta_row <- metadata_df %>%
+      dplyr::filter(fish_id == fish_col)
+
+    calculate_rmr_single(single_df, meta_row)
+  })
+
+  names(results) <- oxygen_cols
+  return(results)
+}
+```
+
