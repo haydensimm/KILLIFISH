@@ -23,22 +23,22 @@ creating the dataframeS
 ```{r}
 suppressWarnings(
   suppressMessages({
-#GROUP1
-df_killifish_respirometry_acclimation_group3 <- read_delim("../DATA/RESPIROMETRY/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP3.txt")
-df_background_respirometry_acclimation_group3 <- read_delim("../DATA/RESPIROMETRY/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP3.txt")
-df_killifish_respirometry_opposite_group3 <- read_delim("../DATA/RESPIROMETRY/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP3.txt")
-df_background_respirometry_opposite_group3 <- read_delim("../DATA/RESPIROMETRY/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP3.txt")
+#GROUP3
+df_killifish_respirometry_acclimation_group3 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP3.txt")
+#df_background_respirometry_acclimation_group3 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP3.txt")
+df_killifish_respirometry_opposite_group3 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP3.txt")
+#df_background_respirometry_opposite_group3 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP3.txt")
   })
 )
 ```
 
-Creating a list of all data frames, preserving the orignal names 
+Creating a list of all data frames, preserving the original names 
 ```{r}
 dfs_group3 <- mget(c(
   "df_killifish_respirometry_acclimation_group3",
-  "df_background_respirometry_acclimation_group3",
-  "df_killifish_respirometry_opposite_group3",
-  "df_background_respirometry_opposite_group3"
+  #"df_background_respirometry_acclimation_group3",
+  "df_killifish_respirometry_opposite_group3"
+  #"df_background_respirometry_opposite_group3"
 ))
 ```
 
@@ -144,7 +144,7 @@ fish16_acclimation <- dfs_processed_group3[["df_killifish_respirometry_acclimati
 ```
 
 ```{r}
-fish16_opposite <- dfs_processed_group2[["df_killifish_respirometry_opposite_group2"]] %>%
+fish16_opposite <- dfs_processed_group3[["df_killifish_respirometry_opposite_group3"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_1_main") %>%
   inspect(time = 1, oxygen = 2, plot = FALSE) %>%
   subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
@@ -165,8 +165,24 @@ fish16_opposite <- dfs_processed_group2[["df_killifish_respirometry_opposite_gro
 ```{r}
 group3_data <- bind_rows(
   mget(c("fish16_acclimation", 
-         "fish16_opposite")),
+         "fish16_opposite",
+         "fish17_acclimation", 
+         "fish17_opposite",
+         "fish18_acclimation", 
+         "fish18_opposite",
+         "fish19_acclimation", 
+         "fish19_opposite",
+         "fish20_acclimation", 
+         "fish20_opposite",
+         "fish21_acclimation", 
+         "fish21_opposite",
+         "fish22_acclimation", 
+         "fish22_opposite")),
   .id = "fish_ID"
 )
+```
+
+```{r}
+write.csv(group3_data, "../ANALYSIS/group3_data.csv", row.names = FALSE)
 ```
 
