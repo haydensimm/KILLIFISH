@@ -125,8 +125,8 @@ rm(dfs_group4,
 ```
 
 ```{r}
-fish27_acclimation <- dfs_processed_group4[["df_killifish_respirometry_acclimation_group4"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_2_main") %>%
+fish29_acclimation <- dfs_processed_group4[["df_killifish_respirometry_acclimation_group4"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
   inspect(time = 1, oxygen = 2, plot = FALSE) %>%
   subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
   auto_rate.int(start = 850, #time that flush pump is on, in seconds
@@ -134,7 +134,7 @@ fish27_acclimation <- dfs_processed_group4[["df_killifish_respirometry_acclimati
                 measure = 200, #wait + measure times should add to time that flush pump is off
                 method = "linear", width = 100, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 28, t = 24, mass = 0.007224) %>%
+               volume = 0.175, S = 11, t = 24, mass = 0.00689) %>%
   #plot(pos =10) %>%
   #summary(pos =5) #%>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
@@ -144,16 +144,16 @@ fish27_acclimation <- dfs_processed_group4[["df_killifish_respirometry_acclimati
 ```
 
 ```{r}
-fish27_opposite <- dfs_processed_group4[["df_killifish_respirometry_opposite_group4"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_2_main") %>%
+fish29_opposite <- dfs_processed_group4[["df_killifish_respirometry_opposite_group4"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
   inspect(time = 1, oxygen = 2, plot = FALSE) %>%
   subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
   auto_rate.int(start = 850, #time that flush pump is on, in seconds
-                wait =200, 
+                wait = 200, 
                 measure = 520, #wait + measure times should add to time that flush pump is off
                 method = "linear", width = 400, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 28, t = 10, mass = 0.007224) %>%
+               volume = 0.175, S = 11, t = 10, mass = 0.00689) %>%
   #plot(pos =10) %>%
   #summary(pos =10) %>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
