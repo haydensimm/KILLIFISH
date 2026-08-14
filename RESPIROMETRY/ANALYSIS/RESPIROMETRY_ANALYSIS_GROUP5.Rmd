@@ -125,16 +125,16 @@ rm(dfs_group5,
 ```
 
 ```{r}
-fish29_acclimation <- dfs_processed_group5[["df_killifish_respirometry_acclimation_group5"]] %>%
+fish36_acclimation <- dfs_processed_group5[["df_killifish_respirometry_acclimation_group5"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
   inspect(time = 1, oxygen = 2, plot = FALSE) %>%
   subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
   auto_rate.int(start = 850, #time that flush pump is on, in seconds
                 wait = 100, 
                 measure = 200, #wait + measure times should add to time that flush pump is off
-                method = "linear", width = 100, by = "time") %>%
+                method = "linear", width = 150, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 24, mass = 0.00689) %>%
+               volume = 0.175, S = 11, t = 24, mass = 0.007191) %>%
   #plot(pos =10) %>%
   #summary(pos =5) #%>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
@@ -144,7 +144,7 @@ fish29_acclimation <- dfs_processed_group5[["df_killifish_respirometry_acclimati
 ```
 
 ```{r}
-fish29_opposite <- dfs_processed_group5[["df_killifish_respirometry_opposite_group5"]] %>%
+fish36_opposite <- dfs_processed_group5[["df_killifish_respirometry_opposite_group5"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
   inspect(time = 1, oxygen = 2, plot = FALSE) %>%
   subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
@@ -153,9 +153,9 @@ fish29_opposite <- dfs_processed_group5[["df_killifish_respirometry_opposite_gro
                 measure = 520, #wait + measure times should add to time that flush pump is off
                 method = "linear", width = 400, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 10, mass = 0.00689) %>%
-  #plot(pos =10) %>%
-  #summary(pos =10) %>% this is to specifically look at specific replicates
+               volume = 0.175, S = 11, t = 10, mass = 0.007191) %>%
+  #plot(pos = ) %>%
+  #summary(pos = ) %>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "lowest_percentile", n = 0.1) %>%
   mean() %>% #this is your final value
@@ -164,20 +164,20 @@ fish29_opposite <- dfs_processed_group5[["df_killifish_respirometry_opposite_gro
 
 ```{r}
 group5_data <- bind_rows(
-  mget(c("fish23_acclimation", 
-         "fish23_opposite",
-         "fish24_acclimation", 
-         "fish24_opposite",
-         "fish25_acclimation", 
-         "fish25_opposite",
-         "fish26_acclimation", 
-         "fish26_opposite",
-         "fish27_acclimation", 
-         "fish27_opposite",
-         "fish28_acclimation", 
-         "fish28_opposite",
-         "fish29_acclimation", 
-         "fish29_opposite")),
+  mget(c("fish30_acclimation", 
+         "fish30_opposite",
+         "fish31_acclimation", 
+         "fish31_opposite",
+         "fish32_acclimation", 
+         "fish32_opposite",
+         "fish33_acclimation", 
+         "fish33_opposite",
+         "fish34_acclimation", 
+         "fish34_opposite",
+         "fish35_acclimation", 
+         "fish35_opposite",
+         "fish36_acclimation", 
+         "fish36_opposite")),
   .id = "fish_ID"
 )
 ```
