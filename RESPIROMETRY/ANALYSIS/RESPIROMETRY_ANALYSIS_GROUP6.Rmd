@@ -1,0 +1,188 @@
+---
+title: "Respirometry Analysis "
+author: "Hayden Simm"
+date: "2026-02-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Loading packages
+```{r}
+  library(tidyverse)
+  library(dplyr)
+  library(janitor)
+  library(respR)
+  library(readr)
+
+```
+
+creating the dataframeS
+```{r}
+suppressWarnings(
+  suppressMessages({
+#GROUP6
+df_fish37_mmr_opposite <- read.delim("../DATA/FISH37_MMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
+df_fish37_rmr_acclimation <- read.delim("../DATA/FISH37_RMR_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
+df_fish37_rmr_opposite <- read.delim("../DATA/FISH37_RMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
+df_fish37_40_mmr_acclimation <- read.delim("../DATA/FISH37-40_MMR_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
+df_fish38_40_rmr_acclimation <- read.delim("../DATA/FISH38-40_RMR_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
+df_fish41_43_mmr_opposite <- read.delim("../DATA/FISH41-43_MMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
+df_fish41_43_rmr_opposite <- read.delim("../DATA/FISH41-43_RMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
+  })
+)
+```
+
+Creating a list of all data frames, preserving the original names 
+```{r}
+dfs_group6 <- mget(c(
+  "df_fish37_mmr_opposite", "df_fish37_rmr_acclimation", "df_fish37_rmr_opposite", "df_fish37_40_mmr_acclimation", "df_fish38_40_rmr_acclimation", "df_fish41_43_mmr_opposite", "df_fish41_43_rmr_opposite"
+))
+```
+
+Function for removing rows that include device information
+```{r}
+remove_rows <- function(df, marker = "#--- Measurement Data --------------------------------------------------------------------") {
+  # Find the row containing the marker
+  start_row <- which(apply(df, 1, function(x) any(x == marker)))
+  
+  # Keep only rows below the marker
+  df <- df[(start_row + 1):nrow(df), ]
+  
+  return(df)
+}
+```
+*note from the author* Alternatively, I attempted to use a function to select columns by the name in the pyroscience software but unfortunately some runs contained NA where the following titles should have been. Following this I have renamed the columns as they should appear below.
+select_columns <- function(df) {
+  df %>%
+    select(
+    " dt (s) [A Ch.1 Main]",
+    "Oxygen (%air sat.) [A Ch.1 Main]",
+    "Oxygen (%air sat.) [A Ch.2 Main]",
+    "Oxygen (%air sat.) [A Ch.3 Main]",
+    "Oxygen (%air sat.) [A Ch.4 Main]",
+    "Oxygen (%air sat.) [B Ch.1 Main]",
+    "Oxygen (%air sat.) [B Ch.2 Main]",
+    "Oxygen (%air sat.) [B Ch.3 Main]",
+    "Oxygen (%air sat.) [B Ch.4 Main]"
+    ) %>%
+    janitor::clean_names(case = "snake") %>%
+    mutate(across(everything(), as.numeric)) %>%
+    drop_na()
+  }
+
+Renaming columns by what they could/should be in the raw data
+```{r}
+rename_and_clean <- function(df) {
+  
+  # Check that there are 9 columns
+  if (ncol(df) != 9) {
+    stop("Dataframe does not have 9 columns.")
+  }
+  
+  colnames(df) <- c(
+    "dt (s) [A Ch.1 Main]",
+    "Oxygen (%air sat.) [A Ch.1 Main]",
+    "Oxygen (%air sat.) [A Ch.2 Main]",
+    "Oxygen (%air sat.) [A Ch.3 Main]",
+    "Oxygen (%air sat.) [A Ch.4 Main]",
+    "Oxygen (%air sat.) [B Ch.1 Main]",
+    "Oxygen (%air sat.) [B Ch.2 Main]",
+    "Oxygen (%air sat.) [B Ch.3 Main]",
+    "Oxygen (%air sat.) [B Ch.4 Main]"
+  )
+  
+  df %>%
+    janitor::clean_names(case = "snake") %>%
+    mutate(across(everything(), as.numeric)) %>%
+    drop_na()
+}
+```
+
+
+```{r}
+process_functions <- function(df) {
+  df %>%
+    remove_rows() %>%
+    select(3,4,22,40,58,81,99,117,135) %>%
+    rename_and_clean()
+}
+
+dfs_processed_group6 <- lapply(dfs_group6, process_functions)
+```
+
+This is an optional step I recommend removing the original list because of its large size
+```{r}
+rm(dfs_group6,
+   df_killifish_respirometry_acclimation_group6,
+   df_killifish_respirometry_opposite_group6,
+   df_background_respirometry_acclimation_group6,
+   df_background_respirometry_opposite_group6
+)
+
+```
+
+```{r}
+fish36_acclimation <- dfs_processed_group6[["df_killifish_respirometry_acclimation_group6"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
+  inspect(time = 1, oxygen = 2, plot = FALSE) %>%
+  subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
+  auto_rate.int(start = 850, #time that flush pump is on, in seconds
+                wait = 100, 
+                measure = 200, #wait + measure times should add to time that flush pump is off
+                method = "linear", width = 150, by = "time") %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 11, t = 24, mass = 0.007191) %>%
+  #plot(pos =10) %>%
+  #summary(pos =5) #%>% this is to specifically look at specific replicates
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "lowest_percentile", n = 0.1) %>%
+  mean() %>% #this is your final value
+  summary(export = TRUE)
+```
+
+```{r}
+fish36_opposite <- dfs_processed_group6[["df_killifish_respirometry_opposite_group6"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
+  inspect(time = 1, oxygen = 2, plot = FALSE) %>%
+  subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
+  auto_rate.int(start = 850, #time that flush pump is on, in seconds
+                wait = 200, 
+                measure = 520, #wait + measure times should add to time that flush pump is off
+                method = "linear", width = 400, by = "time") %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 11, t = 10, mass = 0.007191) %>%
+  #plot(pos = ) %>%
+  #summary(pos = ) %>% this is to specifically look at specific replicates
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "lowest_percentile", n = 0.1) %>%
+  mean() %>% #this is your final value
+  summary(export = TRUE)
+```
+
+```{r}
+group6_data <- bind_rows(
+  mget(c("fish30_acclimation", 
+         "fish30_opposite",
+         "fish31_acclimation", 
+         "fish31_opposite",
+         "fish32_acclimation", 
+         "fish32_opposite",
+         "fish33_acclimation", 
+         "fish33_opposite",
+         "fish34_acclimation", 
+         "fish34_opposite",
+         "fish35_acclimation", 
+         "fish35_opposite",
+         "fish36_acclimation", 
+         "fish36_opposite")),
+  .id = "fish_ID"
+)
+```
+
+```{r}
+write.csv(group6_data, "../ANALYSIS/group6_data.csv", row.names = FALSE)
+```
+
