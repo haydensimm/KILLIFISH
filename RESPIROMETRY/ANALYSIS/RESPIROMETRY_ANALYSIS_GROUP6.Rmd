@@ -38,7 +38,7 @@ df_fish41_43_rmr_opposite <- read.delim("../DATA/FISH41-43_RMR_OPPOSITE.txt", fi
 Creating a list of all data frames, preserving the original names 
 ```{r}
 dfs_group6 <- mget(c(
-  "df_fish37_mmr_opposite", "df_fish37_rmr_acclimation", "df_fish37_rmr_opposite", "df_fish37_40_mmr_acclimation", "df_fish38_40_rmr_acclimation", "df_fish41_43_mmr_opposite", "df_fish41_43_rmr_opposite"
+  "df_fish37_mmr_opposite", "df_fish37_rmr_acclimation", "df_fish37_rmr_opposite", "df_fish37_40_mmr_acclimation", "df_fish38_40_rmr_acclimation"
 ))
 ```
 
@@ -96,11 +96,9 @@ rename_and_clean <- function(df) {
   
   df %>%
     janitor::clean_names(case = "snake") %>%
-    mutate(across(everything(), as.numeric)) %>%
-    drop_na()
+    mutate(across(everything(), as.numeric))
 }
 ```
-
 
 ```{r}
 process_functions <- function(df) {
@@ -113,15 +111,46 @@ process_functions <- function(df) {
 dfs_processed_group6 <- lapply(dfs_group6, process_functions)
 ```
 
+```{r}
+promote_first_row <- function(df) {
+  new_names <- as.character(unlist(df[1, ]))
+  df <- df[-1, ]
+  names(df) <- new_names
+  rownames(df) <- NULL
+  df
+}
+```
+
+```{r}
+process_functions_lessvariables <- function(df) {
+  df %>%
+    remove_rows() %>%
+    select(3,4,22,40,58) %>%
+    promote_first_row() %>%
+    clean_names() %>%
+    mutate(across(everything(), as.numeric)) %>%
+    drop_na()
+}
+
+df_fish41_43_mmr_opposite <- process_functions_lessvariables(df_fish41_43_mmr_opposite)
+df_fish41_43_rmr_opposite <- process_functions_lessvariables(df_fish41_43_rmr_opposite)
+
+dfs_processed_group6[["df_fish41_43_mmr_opposite"]] <- df_fish41_43_mmr_opposite
+dfs_processed_group6[["df_fish41_43_rmr_opposite"]] <- df_fish41_43_rmr_opposite
+```
+
+
 This is an optional step I recommend removing the original list because of its large size
 ```{r}
 rm(dfs_group6,
-   df_killifish_respirometry_acclimation_group6,
-   df_killifish_respirometry_opposite_group6,
-   df_background_respirometry_acclimation_group6,
-   df_background_respirometry_opposite_group6
-)
-
+   df_fish37_mmr_opposite,
+   df_fish37_rmr_acclimation,
+   df_fish37_rmr_opposite,
+   df_fish37_40_mmr_acclimation,
+   df_fish38_40_rmr_acclimation,
+    df_fish41_43_mmr_opposite,
+    df_fish41_43_rmr_opposite
+  )
 ```
 
 ```{r}
