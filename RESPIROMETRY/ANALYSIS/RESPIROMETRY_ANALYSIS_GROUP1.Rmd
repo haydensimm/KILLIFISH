@@ -125,18 +125,18 @@ rm(dfs_group1,
 ```
 
 ```{r}
-fish36_acclimation <- dfs_processed_group1[["df_killifish_respirometry_acclimation_group1"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
+fish7_acclimation <- dfs_processed_group1[["df_killifish_respirometry_acclimation_group1"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
   inspect(time = 1, oxygen = 2, plot = FALSE) %>%
   subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
-  auto_rate.int(start = 850, #time that flush pump is on, in seconds
-                wait = 100, 
-                measure = 200, #wait + measure times should add to time that flush pump is off
-                method = "linear", width = 150, by = "time") %>%
+  auto_rate.int(start = 600, #time that flush pump is on, in seconds
+                wait = 200, 
+                measure = 280, #wait + measure times should add to time that flush pump is off
+                method = "linear", width = 200, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 24, mass = 0.007191) %>%
-  #plot(pos =10) %>%
-  #summary(pos =5) #%>% this is to specifically look at specific replicates
+               volume = 0.175, S = 11, t = 10, mass = 0.008597) %>%
+  #plot(pos = ) %>%
+  #summary(pos = ) #%>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "lowest_percentile", n = 0.1) %>%
   mean() %>% #this is your final value
@@ -144,22 +144,37 @@ fish36_acclimation <- dfs_processed_group1[["df_killifish_respirometry_acclimati
 ```
 
 ```{r}
-fish36_opposite <- dfs_processed_group1[["df_killifish_respirometry_opposite_group1"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
+fish7_opposite <- dfs_processed_group1[["df_killifish_respirometry_opposite_group1"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
   inspect(time = 1, oxygen = 2, plot = FALSE) %>%
   subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
-  auto_rate.int(start = 850, #time that flush pump is on, in seconds
-                wait = 200, 
-                measure = 520, #wait + measure times should add to time that flush pump is off
-                method = "linear", width = 400, by = "time") %>%
+  auto_rate.int(start = 240, #time that flush pump is on, in seconds
+                wait = 80, 
+                measure = 100, #wait + measure times should add to time that flush pump is off
+                method = "linear", width = 80, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 10, mass = 0.007191) %>%
-  #plot(pos = ) %>%
-  #summary(pos = ) %>% this is to specifically look at specific replicates
+               volume = 0.175, S = 11, t = 24, mass = 0.008597) %>%
+  plot(pos = 30) %>%
+  #summary(pos = ) %>% #this is to look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "lowest_percentile", n = 0.1) %>%
   mean() %>% #this is your final value
   summary(export = TRUE)
+```
+
+if you need a specific position
+```{r}
+fish6_opposite <- dfs_processed_group1[["df_killifish_respirometry_opposite_group1"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_3_main") %>%
+  inspect(time = 1, oxygen = 2, plot = FALSE) %>%
+  subset_data(from = 20000, to = 30000, by = "time") %>%
+  auto_rate.int(start = 240, wait = 80, measure = 100,
+                method = "linear", width = 80, by = "time") %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g',
+               volume = 0.175, S = 11, t = 24, mass = 0.005839)
+
+# Step 2: save the pos =  summary as its own object
+fish6_opposite <- summary(fish6_opposite, pos = 9, export = TRUE)
 ```
 
 ```{r}
