@@ -125,16 +125,16 @@ rm(dfs_group2,
 ```
 
 ```{r}
-fish36_acclimation <- dfs_processed_group2[["df_killifish_respirometry_acclimation_group2"]] %>%
+fish15_acclimation <- dfs_processed_group2[["df_killifish_respirometry_acclimation_group2"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
-  inspect(time = 1, oxygen = 2, plot = FALSE) %>%
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
-  auto_rate.int(start = 850, #time that flush pump is on, in seconds
+  auto_rate.int(start = 600, #time that flush pump is on, in seconds
                 wait = 100, 
                 measure = 200, #wait + measure times should add to time that flush pump is off
                 method = "linear", width = 150, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 24, mass = 0.007191) %>%
+               volume = 0.175, S = 11, t = 24, mass = 0.007664) %>%
   #plot(pos = ) %>%
   #summary(pos = ) #%>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
@@ -144,16 +144,16 @@ fish36_acclimation <- dfs_processed_group2[["df_killifish_respirometry_acclimati
 ```
 
 ```{r}
-fish36_opposite <- dfs_processed_group2[["df_killifish_respirometry_opposite_group2"]] %>%
+fish15_opposite <- dfs_processed_group2[["df_killifish_respirometry_opposite_group2"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
-  inspect(time = 1, oxygen = 2, plot = FALSE) %>%
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
-  auto_rate.int(start = 850, #time that flush pump is on, in seconds
+  auto_rate.int(start = 600, #time that flush pump is on, in seconds
                 wait = 200, 
-                measure = 520, #wait + measure times should add to time that flush pump is off
-                method = "linear", width = 400, by = "time") %>%
+                measure = 400, #wait + measure times should add to time that flush pump is off
+                method = "linear", width = 200, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 10, mass = 0.007191) %>%
+               volume = 0.175, S = 11, t = 10, mass = 0.007664) %>%
   #plot(pos = ) %>%
   #summary(pos = ) %>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
