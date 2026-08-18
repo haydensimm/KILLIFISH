@@ -154,8 +154,8 @@ fish7_opposite <- dfs_processed_group1[["df_killifish_respirometry_opposite_grou
                 method = "linear", width = 80, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
                volume = 0.175, S = 11, t = 24, mass = 0.008597) %>%
-  plot(pos = 30) %>%
-  #summary(pos = ) %>% #this is to look at specific replicates
+  # plot(pos = ) %>%
+  # summary(pos = ) %>% #this is to look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "lowest_percentile", n = 0.1) %>%
   mean() %>% #this is your final value
