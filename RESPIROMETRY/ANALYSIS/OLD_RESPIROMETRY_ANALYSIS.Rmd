@@ -74,11 +74,10 @@ df_bact <- df_bact %>% drop_na()
 
 #MMR
 ```{r}
-MMR_B4<-df_fish %>%
-  select(time, B4) %>%
-  na.omit() %>%
+fish40_acclimation_mmr <- dfs_processed_group6[["df_fish38_40_rmr_acclimation"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_3_main") %>%
   subset_data(from = 1100, to = 1200, by = "row") %>% #subset to time when MMR was preformed
-  inspect(time = 1, oxygen = 2) %>%
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.2, by = "row") %>%
   #plot(pos = 6) %>% ##to look at different ranks, pick the rank that covers the obvious region
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
