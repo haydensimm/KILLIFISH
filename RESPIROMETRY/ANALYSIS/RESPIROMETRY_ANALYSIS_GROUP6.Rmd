@@ -105,11 +105,13 @@ process_functions <- function(df) {
   df %>%
     remove_rows() %>%
     select(3,4,22,40,58,81,99,117,135) %>%
+    slice(1:50000) %>%
     rename_and_clean()
 }
 
 dfs_processed_group6 <- lapply(dfs_group6, process_functions)
 ```
+i slice from 50 000 because time rows beyond this contain NAs
 
 ```{r}
 promote_first_row <- function(df) {
@@ -154,18 +156,18 @@ rm(dfs_group6,
 ```
 
 ```{r}
-fish37_acclimation <- dfs_processed_group6[["df_fish37_rmr_acclimation"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_2_main") %>%
+fish40_acclimation <- dfs_processed_group6[["df_fish38_40_rmr_acclimation"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_3_main") %>%
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
   auto_rate.int(start = 850, #time that flush pump is on, in seconds
-                wait = 200, 
-                measure = 400, #wait + measure times should add to time that flush pump is off
-                method = "linear", width = 200, by = "time") %>%
+                wait = 100, 
+                measure = 150, #wait + measure times should add to time that flush pump is off
+                method = "linear", width = 100, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 28, t = 10, mass = 0.008592) %>%
-  #plot(pos =10) %>%
-  #summary(pos =5) #%>% this is to specifically look at specific replicates
+               volume = 0.175, S = 11, t = 24, mass = 0.008942) %>%
+  #plot(pos = ) %>%
+  #summary(pos = ) #%>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "lowest_percentile", n = 0.1) %>%
   mean() %>% #this is your final value
@@ -173,16 +175,16 @@ fish37_acclimation <- dfs_processed_group6[["df_fish37_rmr_acclimation"]] %>%
 ```
 
 ```{r}
-fish37_opposite <- dfs_processed_group6[["df_fish37_rmr_opposite"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_2_main") %>%
+fish41_opposite <- dfs_processed_group6[["df_fish41_43_rmr_opposite"]] %>%
+  select("dt_s_b_ch_1_main", "oxygen_percent_air_sat_b_ch_1_main") %>%
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
-  subset_data(from = 20000, to = 30000, by = "time") %>% #subset to after MMR and middle of night 
+  subset_data(from = 1, to = 13000, by = "time") %>% #subset to after MMR and middle of night 
   auto_rate.int(start = 850, #time that flush pump is on, in seconds
                 wait = 200, 
-                measure = 520, #wait + measure times should add to time that flush pump is off
-                method = "linear", width = 400, by = "time") %>%
+                measure = 400, #wait + measure times should add to time that flush pump is off
+                method = "linear", width = 50, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 28, t = 24, mass = 0.008592) %>%
+               volume = 0.175, S = 28, t = 10, mass = 0.005648) %>%
   #plot(pos = ) %>%
   #summary(pos = ) %>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
@@ -193,20 +195,11 @@ fish37_opposite <- dfs_processed_group6[["df_fish37_rmr_opposite"]] %>%
 
 ```{r}
 group6_data <- bind_rows(
-  mget(c("fish30_acclimation", 
-         "fish30_opposite",
-         "fish31_acclimation", 
-         "fish31_opposite",
-         "fish32_acclimation", 
-         "fish32_opposite",
-         "fish33_acclimation", 
-         "fish33_opposite",
-         "fish34_acclimation", 
-         "fish34_opposite",
-         "fish35_acclimation", 
-         "fish35_opposite",
-         "fish36_acclimation", 
-         "fish36_opposite")),
+  mget(c("fish37_acclimation", 
+         "fish37_opposite",
+         "fish38_acclimation", 
+         "fish39_acclimation", 
+         "fish40_acclimation")),
   .id = "fish_ID"
 )
 ```
