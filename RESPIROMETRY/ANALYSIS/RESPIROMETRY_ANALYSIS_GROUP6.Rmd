@@ -182,7 +182,7 @@ fish41_opposite <- dfs_processed_group6[["df_fish41_43_rmr_opposite"]] %>%
   auto_rate.int(start = 900, #time that flush pump is on, in seconds
                 wait = 200, 
                 measure = 400, #wait + measure times should add to time that flush pump is off
-                method = "linear", width = 30, by = "time") %>%
+                method = "linear", width = 40, by = "time") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
                volume = 0.175, S = 28, t = 10, mass = 0.005648) %>%
   #plot(pos = ) %>%
