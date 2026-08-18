@@ -177,16 +177,32 @@ fish6_opposite <- dfs_processed_group1[["df_killifish_respirometry_opposite_grou
 fish6_opposite <- summary(fish6_opposite, pos = 9, export = TRUE)
 ```
 
-#MMR
+#MMR AcCLIMATION
 ```{r}
-fish40_acclimation_mmr <- dfs_processed_group6[["df_fish38_40_rmr_acclimation"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_3_main") %>%
-  subset_data(from = 1100, to = 1200, by = "row") %>% #subset to time when MMR was preformed
+fish7_acclimation_mmr <- dfs_processed_group1[["df_killifish_respirometry_acclimation_group1"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
+  subset_data(from = 350, to = 450, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.2, by = "row") %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 11, t = 10, mass = 0.008597) %>%
+  ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+#MMR OPPOSITE
+```{r}
+fish7_opposite_mmr <- dfs_processed_group1[["df_killifish_respirometry_opposite_group1"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
+  subset_data(from = 1050, to = 1200, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.2, by = "row") %>%
   #plot(pos = 6) %>% ##to look at different ranks, pick the rank that covers the obvious region
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 24, mass = 0.00689) %>%
+               volume = 0.175, S = 11, t = 24, mass = 0.008597) %>%
   ## ^adjust volume (in litres), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
@@ -196,19 +212,33 @@ fish40_acclimation_mmr <- dfs_processed_group6[["df_fish38_40_rmr_acclimation"]]
 
 ```{r}
 group1_data <- bind_rows(
-  mget(c("fish4_acclimation", 
-         "fish4_opposite",
-         "fish5_acclimation", 
-         "fish5_opposite",
-         "fish6_acclimation", 
-         "fish6_opposite",
-         "fish7_acclimation", 
-         "fish7_opposite")),
+  mget(c("fish4_acclimation_mmr", 
+         "fish4_opposite_mmr",
+         "fish5_acclimation_mmr", 
+         "fish5_opposite_mmr",
+         "fish6_acclimation_mmr", 
+         "fish6_opposite_mmr",
+         "fish7_acclimation_mmr", 
+         "fish7_opposite_mmr")),
   .id = "fish_ID"
 )
 ```
 
 ```{r}
-write.csv(group1_data, "../ANALYSIS/group1_data.csv", row.names = FALSE)
+group1_mmr_data <- bind_rows(
+  mget(c("fish4_acclimation_mmr", 
+         "fish4_opposite_mmr",
+         "fish5_acclimation_mmr", 
+         "fish5_opposite_mmr",
+         "fish6_acclimation_mmr", 
+         "fish6_opposite_mmr",
+         "fish7_acclimation_mmr", 
+         "fish7_opposite_mmr")),
+  .id = "fish_ID"
+)
+```
+
+```{r}
+write.csv(group1_mmr_data, "../ANALYSIS/group1_mmr_data.csv", row.names = FALSE)
 ```
 
