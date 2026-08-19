@@ -188,13 +188,13 @@ write.csv(group3_data, "../ANALYSIS/group3_data.csv", row.names = FALSE)
 
 #MMR ACCLIMATION
 ```{r}
-fish20_acclimation_mmr <- dfs_processed_group3[["df_killifish_respirometry_acclimation_group3"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_2_main") %>%
-  subset_data(from = 600, to = 680, by = "row") %>% #subset to time when MMR was preformed
+fish22_acclimation_mmr <- dfs_processed_group3[["df_killifish_respirometry_acclimation_group3"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
+  subset_data(from = 950, to = 1000, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.4, by = "row") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 28, t = 24, mass = 0.006564) %>%
+               volume = 0.175, S = 11, t = 24, mass = 0.005221) %>%
   ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
@@ -204,14 +204,14 @@ fish20_acclimation_mmr <- dfs_processed_group3[["df_killifish_respirometry_accli
 
 #MMR OPPOSITE
 ```{r}
-fish20_opposite_mmr <- dfs_processed_group3[["df_killifish_respirometry_opposite_group3"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_2_main") %>%
-  subset_data(from = 240, to = 400, by = "row") %>% #subset to time when MMR was preformed
+fish22_opposite_mmr <- dfs_processed_group3[["df_killifish_respirometry_opposite_group3"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
+  subset_data(from = 520, to = 620, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
-  auto_rate(method = "linear", width = 0.2, by = "row") %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
   #plot(pos = 6) %>% ##to look at different ranks, pick the rank that covers the obvious region
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 28, t = 10, mass = 0.006564) %>%
+               volume = 0.175, S = 11, t = 10, mass = 0.005221) %>%
   ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
