@@ -136,7 +136,7 @@ fish29_acclimation <- dfs_processed_group4[["df_killifish_respirometry_acclimati
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
                volume = 0.175, S = 11, t = 24, mass = 0.00689) %>%
   #plot(pos =10) %>%
-  #summary(pos =5) #%>% this is to specifically look at specific replicates
+  #summary(pos =5) %>% this is to specifically look at specific replicates
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "lowest_percentile", n = 0.1) %>%
   mean() %>% #this is your final value
@@ -188,13 +188,13 @@ write.csv(group4_data, "../ANALYSIS/group4_data.csv", row.names = FALSE)
 
 #MMR ACCLIMATION
 ```{r}
-fish22_acclimation_mmr <- dfs_processed_group4[["df_killifish_respirometry_acclimation_group4"]] %>%
+fish29_acclimation_mmr <- dfs_processed_group4[["df_killifish_respirometry_acclimation_group4"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
-  subset_data(from = 950, to = 1000, by = "row") %>% #subset to time when MMR was preformed
+  subset_data(from = 1120, to = 1170, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.4, by = "row") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 24, mass = 0.005221) %>%
+               volume = 0.175, S = 11, t = 24, mass = 0.00689) %>%
   ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
@@ -204,14 +204,15 @@ fish22_acclimation_mmr <- dfs_processed_group4[["df_killifish_respirometry_accli
 
 #MMR OPPOSITE
 ```{r}
-fish22_opposite_mmr <- dfs_processed_group4[["df_killifish_respirometry_opposite_group4"]] %>%
+fish29_opposite_mmr <- dfs_processed_group4[["df_killifish_respirometry_opposite_group4"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
-  subset_data(from = 520, to = 620, by = "row") %>% #subset to time when MMR was preformed
+  subset_data(from = 835, to = 890, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.4, by = "row") %>%
-  #plot(pos = 6) %>% ##to look at different ranks, pick the rank that covers the obvious region
+  #plot(pos = ) %>% ##to look at different ranks, pick the rank that covers the obvious region
+  #summary(pos = ) %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 10, mass = 0.005221) %>%
+               volume = 0.175, S = 11, t = 10, mass = 0.00689) %>%
   ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
