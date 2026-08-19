@@ -186,15 +186,15 @@ group3_data <- bind_rows(
 write.csv(group3_data, "../ANALYSIS/group3_data.csv", row.names = FALSE)
 ```
 
-#MMR AcCLIMATION
+#MMR ACCLIMATION
 ```{r}
-fish15_acclimation_mmr <- dfs_processed_group3[["df_killifish_respirometry_acclimation_group3"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
-  subset_data(from = 870, to = 900, by = "row") %>% #subset to time when MMR was preformed
+fish20_acclimation_mmr <- dfs_processed_group3[["df_killifish_respirometry_acclimation_group3"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_2_main") %>%
+  subset_data(from = 600, to = 680, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
-  auto_rate(method = "linear", width = 0.2, by = "row") %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 24, mass = 0.007664) %>%
+               volume = 0.175, S = 28, t = 24, mass = 0.006564) %>%
   ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
@@ -204,15 +204,15 @@ fish15_acclimation_mmr <- dfs_processed_group3[["df_killifish_respirometry_accli
 
 #MMR OPPOSITE
 ```{r}
-fish15_opposite_mmr <- dfs_processed_group3[["df_killifish_respirometry_opposite_group3"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
-  subset_data(from = 300, to = 600, by = "row") %>% #subset to time when MMR was preformed
+fish20_opposite_mmr <- dfs_processed_group3[["df_killifish_respirometry_opposite_group3"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_2_main") %>%
+  subset_data(from = 240, to = 400, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.2, by = "row") %>%
   #plot(pos = 6) %>% ##to look at different ranks, pick the rank that covers the obvious region
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 10, mass = 0.007664) %>%
-  ## ^adjust volume (in litres), salinity (ppt), temperature (C), mass (in kg)
+               volume = 0.175, S = 28, t = 10, mass = 0.006564) %>%
+  ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
   select_rate(method = "highest", n = 1) %>%
@@ -221,20 +221,20 @@ fish15_opposite_mmr <- dfs_processed_group3[["df_killifish_respirometry_opposite
 
 ```{r}
 group3_mmr_data <- bind_rows(
-  mget(c("fish9_acclimation_mmr", 
-         "fish9_opposite_mmr",
-         "fish10_acclimation_mmr", 
-         "fish10_opposite_mmr",
-         "fish11_acclimation_mmr", 
-         "fish11_opposite_mmr",
-         "fish12_acclimation_mmr", 
-         "fish12_opposite_mmr",
-         "fish13_acclimation_mmr", 
-         "fish13_opposite_mmr",
-         "fish14_acclimation_mmr", 
-         "fish14_opposite_mmr",
-         "fish15_acclimation_mmr", 
-         "fish15_opposite_mmr")),
+  mget(c("fish16_acclimation_mmr", 
+         "fish16_opposite_mmr",
+         "fish17_acclimation_mmr", 
+         "fish17_opposite_mmr",
+         "fish18_acclimation_mmr", 
+         "fish18_opposite_mmr",
+         "fish19_acclimation_mmr", 
+         "fish19_opposite_mmr",
+         "fish20_acclimation_mmr", 
+         "fish20_opposite_mmr",
+         "fish21_acclimation_mmr", 
+         "fish21_opposite_mmr",
+         "fish22_acclimation_mmr", 
+         "fish22_opposite_mmr")),
   .id = "fish_ID"
 )
 ```
