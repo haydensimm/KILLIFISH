@@ -186,3 +186,60 @@ group5_data <- bind_rows(
 write.csv(group5_data, "../ANALYSIS/group5_data.csv", row.names = FALSE)
 ```
 
+#MMR ACCLIMATION
+```{r}
+fish30_acclimation_mmr <- dfs_processed_group5[["df_killifish_respirometry_acclimation_group5"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
+  subset_data(from = 1120, to = 1170, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 11, t = 24, mass = 0.00689) %>%
+  ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+#MMR OPPOSITE
+```{r}
+fish30_opposite_mmr <- dfs_processed_group5[["df_killifish_respirometry_opposite_group5"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
+  subset_data(from = 835, to = 890, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
+  #plot(pos = ) %>% ##to look at different ranks, pick the rank that covers the obvious region
+  #summary(pos = ) %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 11, t = 10, mass = 0.00689) %>%
+  ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+```{r}
+group5_mmr_data <- bind_rows(
+  mget(c("fish30_acclimation_mmr", 
+         "fish30_opposite_mmr",
+         "fish31_acclimation_mmr", 
+         "fish31_opposite_mmr",
+         "fish32_acclimation_mmr", 
+         "fish32_opposite_mmr",
+         "fish33_acclimation_mmr", 
+         "fish33_opposite_mmr",
+         "fish34_acclimation_mmr", 
+         "fish34_opposite_mmr",
+         "fish35_acclimation_mmr", 
+         "fish35_opposite_mmr",
+         "fish36_acclimation_mmr", 
+         "fish36_opposite_mmr")),
+  .id = "fish_ID"
+)
+```
+
+```{r}
+write.csv(group5_mmr_data, "../ANALYSIS/group5_mmr_data.csv", row.names = FALSE)
+```
