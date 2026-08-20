@@ -25,9 +25,9 @@ suppressWarnings(
   suppressMessages({
 #GROUP1
 df_killifish_respirometry_acclimation_group1 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
-#df_background_respirometry_acclimation_group1 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
+df_background_respirometry_acclimation_group1 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
 df_killifish_respirometry_opposite_group1 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP1.txt")
-#df_background_respirometry_opposite_group1 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP1.txt")
+df_background_respirometry_opposite_group1 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP1.txt")
   })
 )
 ```
@@ -36,9 +36,9 @@ Creating a list of all data frames, preserving the original names
 ```{r}
 dfs_group1 <- mget(c(
   "df_killifish_respirometry_acclimation_group1",
-  #"df_background_respirometry_acclimation_group1",
-  "df_killifish_respirometry_opposite_group1"
-  #"df_background_respirometry_opposite_group1"
+  "df_background_respirometry_acclimation_group1",
+  "df_killifish_respirometry_opposite_group1",
+  "df_background_respirometry_opposite_group1"
 ))
 ```
 
@@ -124,6 +124,7 @@ rm(dfs_group1,
 
 ```
 
+#RMR Acclimation
 ```{r}
 fish7_acclimation <- dfs_processed_group1[["df_killifish_respirometry_acclimation_group1"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
@@ -143,6 +144,7 @@ fish7_acclimation <- dfs_processed_group1[["df_killifish_respirometry_acclimatio
   summary(export = TRUE)
 ```
 
+#RMR Opposite
 ```{r}
 fish7_opposite <- dfs_processed_group1[["df_killifish_respirometry_opposite_group1"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
@@ -242,3 +244,53 @@ group1_mmr_data <- bind_rows(
 write.csv(group1_mmr_data, "../ANALYSIS/group1_mmr_data.csv", row.names = FALSE)
 ```
 
+#Background ACCLIMATION
+```{r}
+fish4_acclimation_background <- dfs_processed_group1[["df_background_respirometry_acclimation_group1"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
+  subset_data(from = 350, to = 450, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.2, by = "row") %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 11, t = 10, mass = 0.008597) %>%
+  ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+#Background OPPOSITE
+```{r}
+fish7_opposite_background <- dfs_processed_group1[["df_background_respirometry_opposite_group1"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
+  subset_data(from = 1050, to = 1200, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.2, by = "row") %>%
+  #plot(pos = 6) %>% ##to look at different ranks, pick the rank that covers the obvious region
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 11, t = 24, mass = 0.008597) %>%
+  ## ^adjust volume (in litres), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+```{r}
+group1_background_data <- bind_rows(
+  mget(c("fish4_acclimation_background", 
+         "fish4_opposite_background",
+         "fish5_acclimation_background", 
+         "fish5_opposite_background",
+         "fish6_acclimation_background", 
+         "fish6_opposite_background",
+         "fish7_acclimation_background", 
+         "fish7_opposite_background")),
+  .id = "fish_ID"
+)
+```
+
+```{r}
+write.csv(group1_background_data, "../ANALYSIS/group1_background_data.csv", row.names = FALSE)
+```
