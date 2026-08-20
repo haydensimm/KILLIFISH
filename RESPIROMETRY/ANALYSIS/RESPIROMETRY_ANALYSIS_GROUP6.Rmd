@@ -223,3 +223,55 @@ group6_data <- bind_rows(
 write.csv(group6_data, "../ANALYSIS/group6_data.csv", row.names = FALSE)
 ```
 
+#MMR ACCLIMATION
+```{r}
+fish40_acclimation_mmr <- dfs_processed_group6[["df_fish37_40_mmr_acclimation"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_3_main") %>%
+  subset_data(from = 180, to = 400, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
+  # plot(pos = 4) %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 11, t = 24, mass = 0.008942) %>%
+  ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+#MMR OPPOSITE
+```{r}
+fish43_opposite_mmr <- dfs_processed_group6[["df_fish41_43_mmr_opposite"]] %>%
+  select("dt_s_b_ch_1_main", "oxygen_percent_air_sat_b_ch_3_main") %>%
+  subset_data(from = 1, to = 300, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
+   plot(pos = 5) %>%
+  # summary(pos = ) %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 11, t = 10, mass = 0.008065) %>%
+  ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+```{r}
+group6_mmr_data <- bind_rows(
+  mget(c("fish37_acclimation_mmr", 
+         "fish37_opposite_mmr",
+         "fish38_acclimation_mmr", 
+         "fish39_acclimation_mmr", 
+         "fish40_acclimation_mmr", 
+         "fish41_opposite_mmr",
+         "fish42_opposite_mmr", 
+         "fish43_opposite_mmr")),
+  .id = "fish_ID"
+)
+```
+
+```{r}
+write.csv(group6_mmr_data, "../ANALYSIS/group6_mmr_data.csv", row.names = FALSE)
+```
