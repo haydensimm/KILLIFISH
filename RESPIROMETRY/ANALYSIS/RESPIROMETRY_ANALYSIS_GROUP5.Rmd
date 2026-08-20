@@ -188,13 +188,14 @@ write.csv(group5_data, "../ANALYSIS/group5_data.csv", row.names = FALSE)
 
 #MMR ACCLIMATION
 ```{r}
-fish30_acclimation_mmr <- dfs_processed_group5[["df_killifish_respirometry_acclimation_group5"]] %>%
+fish36_acclimation_mmr <- dfs_processed_group5[["df_killifish_respirometry_acclimation_group5"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
-  subset_data(from = 1120, to = 1170, by = "row") %>% #subset to time when MMR was preformed
+  subset_data(from = 1500, to = 1550, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.4, by = "row") %>%
+  #plot(pos = 3) %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 24, mass = 0.00689) %>%
+               volume = 0.175, S = 11, t = 24, mass = 0.007191) %>%
   ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
@@ -204,15 +205,15 @@ fish30_acclimation_mmr <- dfs_processed_group5[["df_killifish_respirometry_accli
 
 #MMR OPPOSITE
 ```{r}
-fish30_opposite_mmr <- dfs_processed_group5[["df_killifish_respirometry_opposite_group5"]] %>%
+fish36_opposite_mmr <- dfs_processed_group5[["df_killifish_respirometry_opposite_group5"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
-  subset_data(from = 835, to = 890, by = "row") %>% #subset to time when MMR was preformed
+  subset_data(from = 850, to = 900, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.4, by = "row") %>%
-  #plot(pos = ) %>% ##to look at different ranks, pick the rank that covers the obvious region
-  #summary(pos = ) %>%
+  # plot(pos = 2) %>%
+  # summary(pos = ) %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 10, mass = 0.00689) %>%
+               volume = 0.175, S = 11, t = 10, mass = 0.007191) %>%
   ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
