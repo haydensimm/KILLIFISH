@@ -252,7 +252,7 @@ fish4_acclimation_background <- dfs_processed_group1[["df_background_respirometr
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.2, by = "row") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 10, mass = 0.008597) %>%
+               volume = 0.175, S = 11, t = 10, mass = 0.001) %>%
   ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
@@ -269,7 +269,7 @@ fish7_opposite_background <- dfs_processed_group1[["df_background_respirometry_o
   auto_rate(method = "linear", width = 0.2, by = "row") %>%
   #plot(pos = 6) %>% ##to look at different ranks, pick the rank that covers the obvious region
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 11, t = 24, mass = 0.008597) %>%
+               volume = 0.175, S = 11, t = 24, mass = 0.001) %>%
   ## ^adjust volume (in litres), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
@@ -292,5 +292,7 @@ group1_background_data <- bind_rows(
 ```
 
 ```{r}
-write.csv(group1_background_data, "../ANALYSIS/group1_background_data.csv", row.names = FALSE)
+group1_background_data %>%
+  select(-mass, -rate.m.spec) %>%
+  write.csv("../ANALYSIS/group1_background_data.csv", row.names = FALSE)
 ```
