@@ -123,6 +123,7 @@ rm(dfs_group1,
 )
 
 ```
+________________________________________________________________________________________________________________________
 
 #RMR Acclimation
 ```{r}
@@ -246,11 +247,11 @@ write.csv(group1_mmr_data, "../ANALYSIS/group1_mmr_data.csv", row.names = FALSE)
 
 #Background ACCLIMATION
 ```{r}
-fish4_acclimation_background <- dfs_processed_group1[["df_background_respirometry_acclimation_group1"]] %>%
+fish7_acclimation_background <- dfs_processed_group1[["df_background_respirometry_acclimation_group1"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
-  subset_data(from = 350, to = 450, by = "row") %>% #subset to time when MMR was preformed
+  subset_data(from = 200, to = 400, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
-  auto_rate(method = "linear", width = 0.2, by = "row") %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
                volume = 0.175, S = 11, t = 10, mass = 0.001) %>%
   ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
@@ -264,10 +265,10 @@ fish4_acclimation_background <- dfs_processed_group1[["df_background_respirometr
 ```{r}
 fish7_opposite_background <- dfs_processed_group1[["df_background_respirometry_opposite_group1"]] %>%
   select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
-  subset_data(from = 1050, to = 1200, by = "row") %>% #subset to time when MMR was preformed
+  subset_data(from =80, to = 120, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
-  auto_rate(method = "linear", width = 0.2, by = "row") %>%
-  #plot(pos = 6) %>% ##to look at different ranks, pick the rank that covers the obvious region
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
+  # plot(pos = ) %>% 
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
                volume = 0.175, S = 11, t = 24, mass = 0.001) %>%
   ## ^adjust volume (in litres), salinity (ppt), temperature (C), mass (in kg)
