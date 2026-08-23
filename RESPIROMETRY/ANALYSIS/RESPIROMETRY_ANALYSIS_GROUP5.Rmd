@@ -25,9 +25,9 @@ suppressWarnings(
   suppressMessages({
 #GROUP5
 df_killifish_respirometry_acclimation_group5 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
-#df_background_respirometry_acclimation_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
+df_background_respirometry_acclimation_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
 df_killifish_respirometry_opposite_group5 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP5.txt")
-#df_background_respirometry_opposite_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP5.txt")
+df_background_respirometry_opposite_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP5.txt")
   })
 )
 ```
@@ -36,9 +36,9 @@ Creating a list of all data frames, preserving the original names
 ```{r}
 dfs_group5 <- mget(c(
   "df_killifish_respirometry_acclimation_group5",
-  #"df_background_respirometry_acclimation_group5",
-  "df_killifish_respirometry_opposite_group5"
-  #"df_background_respirometry_opposite_group5"
+  "df_background_respirometry_acclimation_group5",
+  "df_killifish_respirometry_opposite_group5",
+  "df_background_respirometry_opposite_group5"
 ))
 ```
 
@@ -243,4 +243,63 @@ group5_mmr_data <- bind_rows(
 
 ```{r}
 write.csv(group5_mmr_data, "../ANALYSIS/group5_mmr_data.csv", row.names = FALSE)
+```
+
+#Background ACCLIMATION
+```{r}
+fish30_acclimation_background <- dfs_processed_group5[["df_background_respirometry_acclimation_group5"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_1_main") %>%
+  subset_data(from = 1, to = 500, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 28, t = 10, mass = 0.001) %>%
+  ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+#Background OPPOSITE
+```{r}
+fish30_opposite_background <- dfs_processed_group5[["df_background_respirometry_opposite_group5"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_1_main") %>%
+  subset_data(from = 1, to = 500, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
+   #plot(pos = ) %>% 
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 28, t = 24, mass = 0.001) %>%
+  ## ^adjust volume (in litres), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+```{r}
+group5_background_data <- bind_rows(
+  mget(c("fish30_acclimation_background", 
+         "fish30_opposite_background",
+         "fish31_acclimation_background", 
+         "fish31_opposite_background",
+         "fish32_acclimation_background", 
+         "fish32_opposite_background",
+         "fish33_acclimation_background", 
+         "fish33_opposite_background",
+         "fish34_acclimation_background", 
+         "fish34_opposite_background",
+         "fish35_acclimation_background", 
+         "fish35_opposite_background",
+         "fish36_acclimation_background", 
+         "fish36_opposite_background")),
+  .id = "fish_ID"
+)
+```
+
+```{r}
+group5_background_data %>%
+  select(-mass, -rate.m.spec) %>%
+  write.csv("../ANALYSIS/group5_background_data.csv", row.names = FALSE)
 ```
