@@ -123,6 +123,7 @@ rm(dfs_group5,
 )
 
 ```
+________________________________________________________________________________________________________________________
 
 ```{r}
 fish36_acclimation <- dfs_processed_group5[["df_killifish_respirometry_acclimation_group5"]] %>%
@@ -247,13 +248,13 @@ write.csv(group5_mmr_data, "../ANALYSIS/group5_mmr_data.csv", row.names = FALSE)
 
 #Background ACCLIMATION
 ```{r}
-fish30_acclimation_background <- dfs_processed_group5[["df_background_respirometry_acclimation_group5"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_1_main") %>%
-  subset_data(from = 1, to = 500, by = "row") %>% #subset to time when MMR was preformed
+fish36_acclimation_background <- dfs_processed_group5[["df_background_respirometry_acclimation_group5"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_4_main") %>%
+  subset_data(from = 110, to = 210, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.4, by = "row") %>%
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 28, t = 10, mass = 0.001) %>%
+               volume = 0.175, S = 11, t = 24, mass = 0.001) %>%
   ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
@@ -263,14 +264,14 @@ fish30_acclimation_background <- dfs_processed_group5[["df_background_respiromet
 
 #Background OPPOSITE
 ```{r}
-fish30_opposite_background <- dfs_processed_group5[["df_background_respirometry_opposite_group5"]] %>%
-  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_1_main") %>%
-  subset_data(from = 1, to = 500, by = "row") %>% #subset to time when MMR was preformed
+fish36_opposite_background <- dfs_processed_group5[["df_background_respirometry_opposite_group5"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_4_main") %>%
+  subset_data(from = 150, to = 350, by = "row") %>% #subset to time when MMR was preformed
   inspect(time = 1, oxygen = 2, plot = TRUE) %>%
   auto_rate(method = "linear", width = 0.4, by = "row") %>%
    #plot(pos = ) %>% 
   convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
-               volume = 0.175, S = 28, t = 24, mass = 0.001) %>%
+               volume = 0.175, S = 11, t = 10, mass = 0.001) %>%
   ## ^adjust volume (in litres), salinity (ppt), temperature (C), mass (in kg)
   select_rate(method = "rsq", n = c(0.9,1)) %>%
   select_rate(method = "rank") %>%
