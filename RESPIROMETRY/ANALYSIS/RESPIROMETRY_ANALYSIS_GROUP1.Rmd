@@ -297,3 +297,10 @@ group1_background_data %>%
   select(-mass, -rate.m.spec) %>%
   write.csv("../ANALYSIS/group1_background_data.csv", row.names = FALSE)
 ```
+
+To identify value in last row for background curve
+```{r}
+last(dfs_processed_group1[["df_killifish_respirometry_acclimation_group1"]])
+last(dfs_processed_group1[["df_killifish_respirometry_opposite_group1"]])
+```
+
