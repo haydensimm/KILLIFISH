@@ -31,6 +31,7 @@ df_fish37_40_mmr_acclimation <- read.delim("../DATA/FISH37-40_MMR_ACCLIMATION.tx
 df_fish38_40_rmr_acclimation <- read.delim("../DATA/FISH38-40_RMR_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
 df_fish41_43_mmr_opposite <- read.delim("../DATA/FISH41-43_MMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
 df_fish41_43_rmr_opposite <- read.delim("../DATA/FISH41-43_RMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
+df_fish37_40_background_acclimation <- read.delim("../DATA/FISH37-40_BACKGROUND_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
   })
 )
 ```
@@ -38,7 +39,7 @@ df_fish41_43_rmr_opposite <- read.delim("../DATA/FISH41-43_RMR_OPPOSITE.txt", fi
 Creating a list of all data frames, preserving the original names 
 ```{r}
 dfs_group6 <- mget(c(
-  "df_fish37_mmr_opposite", "df_fish37_rmr_acclimation", "df_fish37_rmr_opposite", "df_fish37_40_mmr_acclimation", "df_fish38_40_rmr_acclimation"
+  "df_fish37_mmr_opposite", "df_fish37_rmr_acclimation", "df_fish37_rmr_opposite", "df_fish37_40_mmr_acclimation", "df_fish38_40_rmr_acclimation", "df_fish37_40_background_acclimation"
 ))
 ```
 
@@ -151,7 +152,8 @@ rm(dfs_group6,
    df_fish37_40_mmr_acclimation,
    df_fish38_40_rmr_acclimation,
     df_fish41_43_mmr_opposite,
-    df_fish41_43_rmr_opposite
+    df_fish41_43_rmr_opposite,
+   df_fish37_40_background_acclimation
   )
 ```
 
@@ -274,4 +276,54 @@ group6_mmr_data <- bind_rows(
 
 ```{r}
 write.csv(group6_mmr_data, "../ANALYSIS/group6_mmr_data.csv", row.names = FALSE)
+```
+
+#Background ACCLIMATION
+```{r}
+fish40_acclimation_background <- dfs_processed_group6[["df_fish37_40_background_acclimation"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_b_ch_3_main") %>%
+  subset_data(from = 600, to = 800, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 11, t = 24, mass = 0.001) %>%
+  ## ^adjust volume (in liters), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+#Background OPPOSITE
+```{r}
+fish37_opposite_background <- dfs_processed_group6[["df_fish37_rmr_opposite"]] %>%
+  select("dt_s_a_ch_1_main", "oxygen_percent_air_sat_a_ch_2_main") %>%
+  subset_data(from = 50480, to = 50530, by = "row") %>% #subset to time when MMR was preformed
+  inspect(time = 1, oxygen = 2, plot = TRUE) %>%
+  auto_rate(method = "linear", width = 0.4, by = "row") %>%
+   #plot(pos = ) %>% 
+  convert_rate(oxy.unit = '%Air', time.unit = 's', output.unit = 'umol/min/g', 
+               volume = 0.175, S = 28, t = 24, mass = 0.001) %>%
+  ## ^adjust volume (in litres), salinity (ppt), temperature (C), mass (in kg)
+  select_rate(method = "rsq", n = c(0.9,1)) %>%
+  select_rate(method = "rank") %>%
+  select_rate(method = "highest", n = 1) %>%
+  summary(export = TRUE) 
+```
+
+```{r}
+group6_background_data <- bind_rows(
+  mget(c("fish37_acclimation_background", 
+         "fish37_opposite_background",
+         "fish38_acclimation_background",
+         "fish39_acclimation_background",
+         "fish40_acclimation_background")),
+  .id = "fish_ID"
+)
+```
+
+```{r}
+group6_background_data %>%
+  select(-mass, -rate.m.spec) %>%
+  write.csv("../ANALYSIS/group6_background_data.csv", row.names = FALSE)
 ```
