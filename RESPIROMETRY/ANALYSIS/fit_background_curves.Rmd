@@ -63,7 +63,7 @@ library(readr)
 ## Load data
 
 ```{r load-data}
-infile <- "background_curve_data.csv"
+infile <- "../GENERATED_DATA/background_curve_data.csv"
 df <- read_csv(infile, show_col_types = FALSE)
 ```
 
@@ -150,5 +150,5 @@ legend("topleft", legend = c("Fitted curve", "Input points (blank/background)", 
 ## Write output CSV
 
 ```{r write-output}
-write_csv(results, "calculated_background_curve.csv")
+write_csv(results, "../GENERATED_DATA/calculated_background_curve.csv")
 ```
