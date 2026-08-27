@@ -24,10 +24,10 @@ creating the dataframeS
 suppressWarnings(
   suppressMessages({
 #GROUP4
-df_killifish_respirometry_acclimation_group4 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP4.txt")
-df_background_respirometry_acclimation_group4 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP4.txt")
-df_killifish_respirometry_opposite_group4 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP4.txt")
-df_background_respirometry_opposite_group4 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP4.txt")
+df_killifish_respirometry_acclimation_group4 <- read_delim("../RAW_DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP4.txt")
+df_background_respirometry_acclimation_group4 <- read_delim("../RAW_DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP4.txt")
+df_killifish_respirometry_opposite_group4 <- read_delim("../RAW_DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP4.txt")
+df_background_respirometry_opposite_group4 <- read_delim("../RAW_DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP4.txt")
   })
 )
 ```
@@ -123,6 +123,7 @@ rm(dfs_group4,
 )
 
 ```
+________________________________________________________________________________________________________________________
 
 ```{r}
 fish29_acclimation <- dfs_processed_group4[["df_killifish_respirometry_acclimation_group4"]] %>%
@@ -301,4 +302,10 @@ group4_background_data <- bind_rows(
 group4_background_data %>%
   select(-mass, -rate.m.spec) %>%
   write.csv("../ANALYSIS/group4_background_data.csv", row.names = FALSE)
+```
+
+To identify value in last row for background curve
+```{r}
+last(dfs_processed_group4[["df_killifish_respirometry_acclimation_group4"]])
+last(dfs_processed_group4[["df_killifish_respirometry_opposite_group4"]])
 ```

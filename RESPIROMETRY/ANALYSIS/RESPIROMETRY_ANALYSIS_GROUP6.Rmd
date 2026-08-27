@@ -24,14 +24,14 @@ creating the dataframeS
 suppressWarnings(
   suppressMessages({
 #GROUP6
-df_fish37_mmr_opposite <- read.delim("../DATA/FISH37_MMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
-df_fish37_rmr_acclimation <- read.delim("../DATA/FISH37_RMR_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
-df_fish37_rmr_opposite <- read.delim("../DATA/FISH37_RMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
-df_fish37_40_mmr_acclimation <- read.delim("../DATA/FISH37-40_MMR_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
-df_fish38_40_rmr_acclimation <- read.delim("../DATA/FISH38-40_RMR_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
-df_fish41_43_mmr_opposite <- read.delim("../DATA/FISH41-43_MMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
-df_fish41_43_rmr_opposite <- read.delim("../DATA/FISH41-43_RMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
-df_fish37_40_background_acclimation <- read.delim("../DATA/FISH37-40_BACKGROUND_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
+df_fish37_mmr_opposite <- read.delim("../RAW_DATA/FISH37_MMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
+df_fish37_rmr_acclimation <- read.delim("../RAW_DATA/FISH37_RMR_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
+df_fish37_rmr_opposite <- read.delim("../RAW_DATA/FISH37_RMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
+df_fish37_40_mmr_acclimation <- read.delim("../RAW_DATA/FISH37-40_MMR_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
+df_fish38_40_rmr_acclimation <- read.delim("../RAW_DATA/FISH38-40_RMR_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
+df_fish41_43_mmr_opposite <- read.delim("../RAW_DATA/FISH41-43_MMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
+df_fish41_43_rmr_opposite <- read.delim("../RAW_DATA/FISH41-43_RMR_OPPOSITE.txt", fileEncoding = "ISO-8859-1")
+df_fish37_40_background_acclimation <- read.delim("../RAW_DATA/FISH37-40_BACKGROUND_ACCLIMATION.txt", fileEncoding = "ISO-8859-1")
   })
 )
 ```

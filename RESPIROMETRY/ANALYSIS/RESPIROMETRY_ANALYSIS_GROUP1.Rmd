@@ -24,10 +24,10 @@ creating the dataframeS
 suppressWarnings(
   suppressMessages({
 #GROUP1
-df_killifish_respirometry_acclimation_group1 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
-df_background_respirometry_acclimation_group1 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
-df_killifish_respirometry_opposite_group1 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP1.txt")
-df_background_respirometry_opposite_group1 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP1.txt")
+df_killifish_respirometry_acclimation_group1 <- read_delim("../RAW_DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
+df_background_respirometry_acclimation_group1 <- read_delim("../RAW_DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP1.txt")
+df_killifish_respirometry_opposite_group1 <- read_delim("../RAW_DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP1.txt")
+df_background_respirometry_opposite_group1 <- read_delim("../RAW_DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP1.txt")
   })
 )
 ```

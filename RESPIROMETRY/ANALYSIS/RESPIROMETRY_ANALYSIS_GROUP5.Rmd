@@ -24,10 +24,10 @@ creating the dataframeS
 suppressWarnings(
   suppressMessages({
 #GROUP5
-df_killifish_respirometry_acclimation_group5 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
-df_background_respirometry_acclimation_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
-df_killifish_respirometry_opposite_group5 <- read_delim("../DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP5.txt")
-df_background_respirometry_opposite_group5 <- read_delim("../DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP5.txt")
+df_killifish_respirometry_acclimation_group5 <- read_delim("../RAW_DATA/KILLIFISH_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
+df_background_respirometry_acclimation_group5 <- read_delim("../RAW_DATA/BACKGROUND_RESPIROMETRY_ACCLIMATION_GROUP5.txt")
+df_killifish_respirometry_opposite_group5 <- read_delim("../RAW_DATA/KILLIFISH_RESPIROMETRY_OPPOSITE_GROUP5.txt")
+df_background_respirometry_opposite_group5 <- read_delim("../RAW_DATA/BACKGROUND_RESPIROMETRY_OPPOSITE_GROUP5.txt")
   })
 )
 ```
@@ -303,4 +303,9 @@ group5_background_data <- bind_rows(
 group5_background_data %>%
   select(-mass, -rate.m.spec) %>%
   write.csv("../ANALYSIS/group5_background_data.csv", row.names = FALSE)
+```
+
+```{r}
+last(dfs_processed_group5[["df_killifish_respirometry_acclimation_group5"]])
+last(dfs_processed_group5[["df_killifish_respirometry_opposite_group5"]])
 ```
