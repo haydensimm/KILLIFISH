@@ -1,4 +1,4 @@
-fish#,group,acclimation_temperature,acclimation_salinity,assay_temperature,rmr_time,rmr_endtime,rmr_rate.abs,full_time,mmr_time,mmr_endtime,mmr_rate.abs,background_time,background_endtime,total_time,background_rate.abs,blank_time,blank_endtime,blank_rate.abs
+fish#,group,acclimation_temperature,acclimation_salinity,assay_temperature,rmr_time,rmr_endtime,rmr_rate_abs,full_time,mmr_time,mmr_endtime,mmr_rate_abs,background_time,background_endtime,total_time,background_rate_abs,blank_time,blank_endtime,blank_rate_abs
 4,1,10,28,10,24409.792,24599.807,0.119320938,56147.14,689.311,884.327,0.998146808,1348.766,1753.784,57495.906,0.058025002,0,0,0
 4,1,10,28,24,22007.611,22077.614,0.891944719,57850.52,2186.148,2276.172,1.700944011,407.457,527.466,58257.977,0.158265439,1413.991,2113.904,0.063857227
 5,1,10,28,10,24434.795,24634.809,0.170834736,56147.14,1344.353,1464.361,0.885132468,1328.764,1743.784,57475.904,0.059442012,0,0,0
