@@ -18,40 +18,20 @@ using two points:
 - Point 1: (`blank_time`, `blank_rate_abs`)
 - Point 2: (`total_time`, `background_rate_abs`)
 
-This curve shape automatically passes through (0, 0) for any value of `b`.
-To make use of that, each row's points are first **shifted so the blank
-point becomes the local origin**:
+This curve shape automatically passes through (0, 0) for any value of `b`,
+which is why it's used here: many rows have a blank point right at the
+origin (rate below detection limit at time 0), and this form handles that
+naturally without forcing the whole curve flat.
 
-$$x' = x - \text{blank\_time} \qquad y' = y - \text{blank\_rate\_abs}$$
+Since there is only one free parameter (`b`) but two data points, `b` is
+estimated by nonlinear least squares (`nls`), minimizing the squared error
+across both points rather than solving them exactly.
 
-Fitting $y' = 2^{bx'} - 1$ in these shifted coordinates automatically passes
-through the blank point exactly (since $x'=0 \Rightarrow y'=0$), leaving
-exactly one equation and one unknown ($b$) from the shifted background
-point -- so $b$ is solved directly, rather than by least-squares
-compromise:
+The fitted curve for each row is then used to calculate the predicted
+background rate at `rmr_time` and `mmr_time`.
 
-$$b = \log_2\!\big((\text{background\_rate\_abs} - \text{blank\_rate\_abs}) + 1\big) \big/ (\text{total\_time} - \text{blank\_time})$$
-
-To predict at `rmr_time` / `mmr_time`, those x-values are shifted into the
-same local coordinates, the curve is applied, and the result is shifted
-back by adding `blank_rate_abs`:
-
-$$y_{\text{pred}} = \Big(2^{\,b\,(x - \text{blank\_time})} - 1\Big) + \text{blank\_rate\_abs}$$
-
-This guarantees the fitted curve passes through both the blank and
-background points exactly, rather than approximating both with a single
-global-origin fit (which performs poorly when `blank_time` and
-`total_time` are on very different scales).
-
-Rows are skipped (`NA` output for `b`, `rmr_background_rate_abs`, and
-`mmr_background_rate_abs`) when:
-
-- any required value (`blank_time`, `blank_rate_abs`, `total_time`,
-  `background_rate_abs`, `rmr_time`, `mmr_time`) is missing (`NA`), or
-- `total_time == blank_time` (no time separation between the two points,
-  so `b` is undefined), or
-- `(background_rate_abs - blank_rate_abs) + 1 <= 0` (would require taking
-  the log of a non-positive number).
+**Rows with any missing (NA) required value are skipped** and get `NA` for
+`b`, `rmr_background_rate_abs`, and `mmr_background_rate_abs`.
 
 ## Setup
 
@@ -63,19 +43,17 @@ library(readr)
 ## Load data
 
 ```{r load-data}
-infile <- "background_curve_data.csv"
+infile <- "../GENERATED_DATA/background_curve_data.csv"
 df <- read_csv(infile, show_col_types = FALSE)
 ```
 
 ## Fitting function
 
 ```{r fit-function}
-# Fits y = 2^(b*x) - 1 to the blank point (x1,y1) and background point
-# (x2,y2), after shifting so (x1,y1) becomes the local origin. Solves b
-# directly from the shifted background point, then predicts at rmr_x and
-# mmr_x (shifting into local coordinates and back).
-# Returns a named list: b, rmr_pred, mmr_pred (all NA if inputs are
-# missing or invalid).
+# Fits y = 2^(b*x) - 1 to the two points (x1,y1) and (x2,y2) via nls,
+# then returns the fitted b along with predictions at rmr_time and mmr_time.
+# Returns a named list: b, rmr_pred, mmr_pred (all NA if inputs are missing
+# or the fit fails).
 fit_background_curve <- function(x1, y1, x2, y2, rmr_x, mmr_x) {
 
   required <- c(x1, y1, x2, y2, rmr_x, mmr_x)
@@ -83,20 +61,27 @@ fit_background_curve <- function(x1, y1, x2, y2, rmr_x, mmr_x) {
     return(list(b = NA_real_, rmr_pred = NA_real_, mmr_pred = NA_real_))
   }
 
-  x2_shifted <- x2 - x1
-  y2_shifted <- y2 - y1
-  ratio <- y2_shifted + 1
+  # Initial guess for b, based on the background point alone
+  ratio <- y2 + 1
+  b0 <- if (x2 != 0 && ratio > 0) log2(ratio) / x2 else 0.0001
 
-  if (x2_shifted == 0 || ratio <= 0) {
+  fit <- tryCatch({
+    nls(
+      y ~ 2^(b * x) - 1,
+      data  = data.frame(x = c(x1, x2), y = c(y1, y2)),
+      start = list(b = b0)
+    )
+  }, error = function(e) NULL)
+
+  if (is.null(fit)) {
     return(list(b = NA_real_, rmr_pred = NA_real_, mmr_pred = NA_real_))
   }
 
-  b <- log2(ratio) / x2_shifted
-
+  b <- coef(fit)[["b"]]
   list(
     b = b,
-    rmr_pred = (2^(b * (rmr_x - x1)) - 1) + y1,
-    mmr_pred = (2^(b * (mmr_x - x1)) - 1) + y1
+    rmr_pred = 2^(b * rmr_x) - 1,
+    mmr_pred = 2^(b * mmr_x) - 1
   )
 }
 ```
@@ -132,7 +117,7 @@ cat("Rows skipped (NA):       ", sum(is.na(results$b)), "\n")
 example_row <- results %>% filter(!is.na(b)) %>% slice(1)
 
 x_seq <- seq(0, max(example_row$mmr_time, example_row$rmr_time, example_row$total_time) * 1.05, length.out = 200)
-y_seq <- (2^(example_row$b * (x_seq - example_row$blank_time)) - 1) + example_row$blank_rate_abs
+y_seq <- 2^(example_row$b * x_seq) - 1
 
 plot(x_seq, y_seq, type = "l", col = "steelblue", lwd = 2,
      xlab = "Time", ylab = "Rate (abs)",
@@ -150,5 +135,5 @@ legend("topleft", legend = c("Fitted curve", "Input points (blank/background)", 
 ## Write output CSV
 
 ```{r write-output}
-write_csv(results, "calculated_background_curve.csv")
+write_csv(results, "../GENERATED_DATA/calculated_background_curve.csv")
 ```
