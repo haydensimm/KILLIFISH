@@ -43,8 +43,8 @@ background points exactly, rather than approximating both with a single
 global-origin fit (which performs poorly when `blank_time` and
 `total_time` are on very different scales).
 
-Rows are skipped (`NA` output for `b`, `rmr_background_rate_abs`, and
-`mmr_background_rate_abs`) when:
+Rows are skipped entirely (`NA` output for `b`, `rmr_background_rate_abs`,
+and `mmr_background_rate_abs`) when:
 
 - any required value (`blank_time`, `blank_rate_abs`, `total_time`,
   `background_rate_abs`, `rmr_time`, `mmr_time`) is missing (`NA`), or
@@ -52,6 +52,12 @@ Rows are skipped (`NA` output for `b`, `rmr_background_rate_abs`, and
   so `b` is undefined), or
 - `(background_rate_abs - blank_rate_abs) + 1 <= 0` (would require taking
   the log of a non-positive number).
+
+**Special case:** if `background_rate_abs == 0` (no background growth was
+measured), no curve can be fit, so `b` is `NA` -- but
+`rmr_background_rate_abs` and `mmr_background_rate_abs` are set to `0`
+rather than `NA`, since a zero background rate implies no growth at any
+time point.
 
 ## Setup
 
@@ -81,6 +87,13 @@ fit_background_curve <- function(x1, y1, x2, y2, rmr_x, mmr_x) {
   required <- c(x1, y1, x2, y2, rmr_x, mmr_x)
   if (any(is.na(required))) {
     return(list(b = NA_real_, rmr_pred = NA_real_, mmr_pred = NA_real_))
+  }
+
+  # Special case: no background growth measured (background_rate_abs == 0)
+  # -> no curve can be fit (b is NA), but the predicted background rate at
+  # rmr_time/mmr_time is treated as 0 rather than NA.
+  if (y2 == 0) {
+    return(list(b = NA_real_, rmr_pred = 0, mmr_pred = 0))
   }
 
   x2_shifted <- x2 - x1
@@ -121,9 +134,10 @@ results <- df %>%
 ## Summary
 
 ```{r summary}
-cat("Total rows:              ", nrow(results), "\n")
-cat("Rows with a fitted curve:", sum(!is.na(results$b)), "\n")
-cat("Rows skipped (NA):       ", sum(is.na(results$b)), "\n")
+cat("Total rows:                          ", nrow(results), "\n")
+cat("Rows with a fitted curve:            ", sum(!is.na(results$b)), "\n")
+cat("Rows with background_rate_abs == 0\n  (b = NA, predictions = 0):         ", sum(is.na(results$b) & results$background_rate_abs == 0, na.rm = TRUE), "\n")
+cat("Rows skipped entirely (all NA):       ", sum(is.na(results$b) & (is.na(results$background_rate_abs) | results$background_rate_abs != 0)), "\n")
 ```
 
 ## Sanity-check plot (every fitted curve)
