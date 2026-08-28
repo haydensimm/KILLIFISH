@@ -126,25 +126,54 @@ cat("Rows with a fitted curve:", sum(!is.na(results$b)), "\n")
 cat("Rows skipped (NA):       ", sum(is.na(results$b)), "\n")
 ```
 
-## Sanity-check plot (one example row)
+## Sanity-check plot (every fitted curve)
 
-```{r example-plot}
-example_row <- results %>% filter(!is.na(b)) %>% slice(1)
+```{r all-curves-setup}
+library(ggplot2)
 
-x_seq <- seq(0, max(example_row$mmr_time, example_row$rmr_time, example_row$total_time) * 1.05, length.out = 200)
-y_seq <- (2^(example_row$b * (x_seq - example_row$blank_time)) - 1) + example_row$blank_rate_abs
+fitted_rows <- results %>%
+  filter(!is.na(b)) %>%
+  mutate(panel_id = paste0("Fish ", `fish#`, " (", assay_temperature, "\u00b0C)"))
 
-plot(x_seq, y_seq, type = "l", col = "steelblue", lwd = 2,
-     xlab = "Time", ylab = "Rate (abs)",
-     main = paste("Fitted curve - fish#", example_row$`fish#`))
-points(c(example_row$blank_time, example_row$total_time),
-       c(example_row$blank_rate_abs, example_row$background_rate_abs),
-       pch = 19, col = "black")
-points(c(example_row$rmr_time, example_row$mmr_time),
-       c(example_row$rmr_background_rate_abs, example_row$mmr_background_rate_abs),
-       pch = 4, col = "red", lwd = 2)
-legend("topleft", legend = c("Fitted curve", "Input points (blank/background)", "Predicted (rmr/mmr)"),
-       col = c("steelblue", "black", "red"), pch = c(NA, 19, 4), lty = c(1, NA, NA), lwd = c(2, NA, 2))
+# Build a smooth curve (many points) for each row, in ORIGINAL (untransformed)
+# coordinates, using the same shift-then-restore formula as the fit itself.
+curve_points <- fitted_rows %>%
+  rowwise() %>%
+  reframe(
+    panel_id = panel_id,
+    x = seq(0, max(total_time, rmr_time, mmr_time) * 1.05, length.out = 100),
+    y = (2^(b * (x - blank_time)) - 1) + blank_rate_abs
+  )
+
+# The two points the curve was fit to
+input_points <- fitted_rows %>%
+  rowwise() %>%
+  reframe(
+    panel_id = panel_id,
+    x = c(blank_time, total_time),
+    y = c(blank_rate_abs, background_rate_abs)
+  )
+
+# The two predicted points
+predicted_points <- fitted_rows %>%
+  rowwise() %>%
+  reframe(
+    panel_id = panel_id,
+    x = c(rmr_time, mmr_time),
+    y = c(rmr_background_rate_abs, mmr_background_rate_abs)
+  )
+```
+
+```{r all-curves-plot, fig.width=14, fig.height=length(unique(curve_points$panel_id))/4*3}
+ggplot() +
+  geom_line(data = curve_points, aes(x = x, y = y), color = "steelblue", linewidth = 0.7) +
+  geom_point(data = input_points, aes(x = x, y = y), color = "black", size = 1.8) +
+  geom_point(data = predicted_points, aes(x = x, y = y), color = "red", shape = 4, stroke = 1, size = 2) +
+  facet_wrap(~ panel_id, scales = "free", ncol = 4) +
+  labs(x = "Time", y = "Rate (abs)",
+       title = "Fitted curve per row (black = input points, red x = predicted rmr/mmr)") +
+  theme_bw(base_size = 10) +
+  theme(strip.text = element_text(size = 8))
 ```
 
 ## Write output CSV
