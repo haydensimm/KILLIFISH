@@ -1,4 +1,4 @@
-fish#,mass_g,group,acclimation_temperature,acclimation_salinity,assay_temperature,rmr_rate_abs,mmr_rate_abs,rmr_background_rate_abs,mmr_background_rate_abs,resting_metabolic_rate_(umolO2/min/g),maximal_metabolic_rate_(umolO2/min/g),aerobic_scope_(umolO2/min/g)
+fish#,mass_(g),group,acclimation_temperature_(C),acclimation_salinity_(ppt),test_temperature_(C),rmr_rate_abs_(umolO2/min),mmr_rate_abs_(umolO2/min),rmr_background_rate_abs_(umolO2/min),mmr_background_rate_abs_(umolO2/min),resting_metabolic_rate_(umolO2/min/g),maximal_metabolic_rate_(umolO2/min/g),aerobic_scope_(umolO2/min/g)
 4,6.932,1,10,28,10,0.119320938,0.998146808,0,0,0.017213061,0.143991173,0.126778112
 4,6.932,1,10,28,24,0.891944719,1.700944011,0.097080112,0.065083423,0.114665985,0.235986813,0.121320828
 5,5.409,1,10,28,10,0.170834736,0.885132468,0,0,0.031583423,0.163640686,0.132057262
