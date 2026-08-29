@@ -1,4 +1,4 @@
-Fish ID (#),Total Length (mm),Mass (g),Sex (M/F),Acclimation Temperature (°C),Acclimation Salinity (ppt),Test Temperature (°C),Maximal COX Activity (µmol/min/mg protein),Maximal CS Activity (µmol/min/mg protein),Maximal LDH Activity (µmol/min/mg protein)
+Fish ID (#),Total Length (mm),Mass (g),Sex (M/F),Acclimation Temperature (C),Acclimation Salinity (ppt),Test Temperature (C),Maximal COX Activity (umol/min/mg protein),Maximal CS Activity (umol/min/mg protein),Maximal LDH Activity (umol/min/mg protein)
 74,74,4.735,F,10,11,10,13.645,5.448,128.559
 74,74,4.735,F,10,11,24,13.028,6.02,172.951
 75,65,3.586,F,10,28,10,14.657,6.145,134.337

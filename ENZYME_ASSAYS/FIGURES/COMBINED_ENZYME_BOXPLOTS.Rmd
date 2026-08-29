@@ -1,7 +1,7 @@
 ---
-title: "boxplots"
+title: "COMBINED_RESPIROMETRY_BOXPLOTS"
 author: "Hayden Simm"
-date: "2026-04-26"
+date: "2026-08-29"
 output: html_document
 ---
 
@@ -20,35 +20,33 @@ library(ggpubr)
 
 Creating dataframe
 ```{r}
-df_respirometry_data <- read_csv("../GENERATED_DATA/final_data.csv")
-
-str(df_respirometry_data)
+df_enzyme_data <- read_csv("../DATA/enzyme_data.csv")
 ```
 
 cleaning names
 ```{r}
-df_respirometry_data <- df_respirometry_data %>%
+df_enzyme_data <- df_enzyme_data %>%
   clean_names()
 
-str(df_respirometry_data)
+str(df_enzyme_data)
 ```
 
 converting predictors to factors
 ```{r}
-df_respirometry_data <- df_respirometry_data %>%
+df_enzyme_data <- df_enzyme_data %>%
   mutate(across(c(acclimation_temperature_c,
                   acclimation_salinity_ppt,
                   test_temperature_c),
                 as.factor))
 ```
 
-RMR
+CS
 ```{r}
-RMR <- ggplot(
-  df_respirometry_data,
+CS <- ggplot(
+  df_enzyme_data,
   aes(
     x = test_temperature_c,
-    y = resting_metabolic_rate_umol_o2_min_g,
+    y = maximal_cs_activity_umol_min_mg_protein,
     color = acclimation_temperature_c
   )
 ) +
@@ -111,7 +109,7 @@ RMR <- ggplot(
   
   labs(
     x = "Test Temperature (°C)",
-    y = "RMR (µmol O₂/g/min)",
+    y = "Maximal Activity (µmol/min/mg protein))",
     color = "Acclimation Temperature (°C)",
     fill = "Acclimation Temperature (°C)"
   ) +
@@ -129,27 +127,27 @@ RMR <- ggplot(
     legend.box.just = "right")
   )
 
-plot(RMR)
+plot(CS)
 ```
 
 Saving photo
 ```{r}
 ggsave(
-  filename = "RMR.png",
-  plot = RMR,
+  filename = "CS.png",
+  plot = CS,
   width = 8,
   height = 4,
   dpi = 300
 )
 ```
 
-MMR
+LDH
 ```{r}
-MMR <- ggplot(
-  df_respirometry_data,
+LDH <- ggplot(
+  df_enzyme_data,
   aes(
     x = test_temperature_c,
-    y = maximal_metabolic_rate_umol_o2_min_g,
+    y = maximal_ldh_activity_umol_min_mg_protein,
     color = acclimation_temperature_c
   )
 ) +
@@ -212,7 +210,7 @@ MMR <- ggplot(
   
   labs(
     x = "Test Temperature (°C)",
-    y = "MMR (µmol O₂/g/min)",
+    y = "Maximal Activity (µmol/min/mg protein)",
     color = "Acclimation Temperature (°C)",
     fill = "Acclimation Temperature (°C)"
   ) +
@@ -230,27 +228,27 @@ MMR <- ggplot(
     legend.box.just = "right")
   )
 
-plot(MMR)
+plot(LDH)
 ```
 
 Saving photo
 ```{r}
 ggsave(
-  filename = "MMR.png",
-  plot = MMR,
+  filename = "LDH.png",
+  plot = LDH,
   width = 8,
   height = 4,
   dpi = 300
 )
 ```
 
-aerobic scope
+COX
 ```{r}
-AS <- ggplot(
-  df_respirometry_data,
+COX <- ggplot(
+  df_enzyme_data,
   aes(
     x = test_temperature_c,
-    y = aerobic_scope_umol_o2_min_g,
+    y = maximal_cox_activity_umol_min_mg_protein,
     color = acclimation_temperature_c
   )
 ) +
@@ -313,7 +311,7 @@ AS <- ggplot(
   
   labs(
     x = "Test Temperature (°C)",
-    y = "Aerobic Scope (µmol O₂/g/min)",
+    y = "Maximal Activity (µmol/min/mg protein)",
     color = "Acclimation Temperature (°C)",
     fill = "Acclimation Temperature (°C)"
   ) +
@@ -331,30 +329,30 @@ AS <- ggplot(
     legend.box.just = "right")
   )
 
-plot(AS)
+plot(COX)
 ```
 
 Saving photo
 ```{r}
 ggsave(
-  filename = "AS.png",
-  plot = AS,
+  filename = "COX.png",
+  plot = COX,
   width = 8,
   height = 4,
   dpi = 300
 )
 ```
 
-Combined RMR/MMR/AS figure (shared y-axis, single legend)
+Combined CS/LDH/COX figure (shared y-axis, single legend)
 ```{r}
 # Strip the individual y-axis titles (and legends) from each plot so they
 # don't repeat in the combined figure - a shared axis label is added after.
-RMR_combo <- RMR + labs(y = NULL)
-MMR_combo <- MMR + labs(y = NULL)
-AS_combo  <- AS  + labs(y = NULL)
+CS_combo <- CS + labs(y = NULL)
+LDH_combo <- LDH + labs(y = NULL)
+COX_combo  <- COX  + labs(y = NULL)
 
-combined_metabolic <- ggarrange(
-  RMR_combo, MMR_combo, AS_combo,
+combined_enzyme <- ggarrange(
+  LDH_combo, CS_combo, COX_combo,
   ncol = 3,
   nrow = 1,
   common.legend = TRUE,
@@ -362,23 +360,23 @@ combined_metabolic <- ggarrange(
   labels = c("A", "B", "C")
 )
 
-combined_metabolic <- annotate_figure(
-  combined_metabolic,
+combined_enzyme <- annotate_figure(
+  combined_enzyme,
   left = text_grob(
-    "Mass specific metabolic rate (\u00b5mol O\u2082/min/g)",
+    "Maximal Enzyme Activity (µmol/min/mg protein)",
     rot = 90,
     size = 14
   )
 )
 
-plot(combined_metabolic)
+plot(combined_enzyme)
 ```
 
 Saving combined figure
 ```{r}
 ggsave(
-  filename = "Combined_Metabolic_Rates.png",
-  plot = combined_metabolic,
+  filename = "Combined_Enzyme.png",
+  plot = combined_enzyme,
   width = 12,
   height =6,
   dpi = 300
