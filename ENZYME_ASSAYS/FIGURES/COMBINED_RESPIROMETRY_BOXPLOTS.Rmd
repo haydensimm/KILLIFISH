@@ -1,0 +1,386 @@
+---
+title: "boxplots"
+author: "Hayden Simm"
+date: "2026-04-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(purrr)
+library(dplyr)
+library(janitor)
+library(ggpubr)
+```
+
+Creating dataframe
+```{r}
+df_respirometry_data <- read_csv("../GENERATED_DATA/final_data.csv")
+
+str(df_respirometry_data)
+```
+
+cleaning names
+```{r}
+df_respirometry_data <- df_respirometry_data %>%
+  clean_names()
+
+str(df_respirometry_data)
+```
+
+converting predictors to factors
+```{r}
+df_respirometry_data <- df_respirometry_data %>%
+  mutate(across(c(acclimation_temperature_c,
+                  acclimation_salinity_ppt,
+                  test_temperature_c),
+                as.factor))
+```
+
+RMR
+```{r}
+RMR <- ggplot(
+  df_respirometry_data,
+  aes(
+    x = test_temperature_c,
+    y = resting_metabolic_rate_umol_o2_min_g,
+    color = acclimation_temperature_c
+  )
+) +
+  
+  # Mean points
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    position = position_dodge(width = 0.3),
+    size = 3
+  ) +
+  
+  # Error bars (SE)
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    position = position_dodge(width = 0.3),
+    width = 0.15
+  ) +
+  
+  # Raw data
+  geom_jitter(
+    aes(fill = acclimation_temperature_c),
+    position = position_jitterdodge(
+      dodge.width = 0.3,
+      jitter.width = 0.15
+    ),
+    alpha = 0.7,
+    size = 2,
+    shape = 21
+  ) +
+  
+  # Match your color palette
+  scale_fill_manual(
+    values = c(
+      "10" = "#6BAED6",
+      "24" = "#FB6A4A"
+    )
+  ) +
+  scale_color_manual(
+    values = c(
+      "10" = "black",
+      "24" = "black"
+    )
+  ) +
+  
+  # Facets (same as your boxplot)
+  facet_wrap(
+    ~ acclimation_salinity_ppt,
+    labeller = labeller(
+      acclimation_salinity_ppt = c(
+        "11" = "Isosmotic (11 ppt)",
+        "28" = "Brackish (28 ppt)"
+      )
+    )
+  ) +
+  
+  # Theme aligned with your original
+  theme_bw() +
+  
+  labs(
+    x = "Test Temperature (°C)",
+    y = "RMR (µmol O₂/g/min)",
+    color = "Acclimation Temperature (°C)",
+    fill = "Acclimation Temperature (°C)"
+  ) +
+  
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth = 1.2),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 14),
+    axis.ticks.length = unit(0.2, "cm"),
+    axis.ticks = element_line(linewidth = 0.8),
+    strip.text = element_text(size = 14),
+    legend.title = element_text(size = 14),
+    theme(legend.position = "bottom",
+    legend.box.just = "right")
+  )
+
+plot(RMR)
+```
+
+Saving photo
+```{r}
+ggsave(
+  filename = "RMR.png",
+  plot = RMR,
+  width = 8,
+  height = 4,
+  dpi = 300
+)
+```
+
+MMR
+```{r}
+MMR <- ggplot(
+  df_respirometry_data,
+  aes(
+    x = test_temperature_c,
+    y = maximal_metabolic_rate_umol_o2_min_g,
+    color = acclimation_temperature_c
+  )
+) +
+  
+  # Mean points
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    position = position_dodge(width = 0.3),
+    size = 3
+  ) +
+  
+  # Error bars (SE)
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    position = position_dodge(width = 0.3),
+    width = 0.15
+  ) +
+  
+  # Raw data
+  geom_jitter(
+    aes(fill = acclimation_temperature_c),
+    position = position_jitterdodge(
+      dodge.width = 0.3,
+      jitter.width = 0.15
+    ),
+    alpha = 0.7,
+    size = 2,
+    shape = 21
+  ) +
+  
+  # Match your color palette
+  scale_fill_manual(
+    values = c(
+      "10" = "#6BAED6",
+      "24" = "#FB6A4A"
+    )
+  ) +
+  scale_color_manual(
+    values = c(
+      "10" = "black",
+      "24" = "black"
+    )
+  ) +
+  
+  # Facets (same as your boxplot)
+  facet_wrap(
+    ~ acclimation_salinity_ppt,
+    labeller = labeller(
+      acclimation_salinity_ppt = c(
+        "11" = "Isosmotic (11 ppt)",
+        "28" = "Brackish (28 ppt)"
+      )
+    )
+  ) +
+  
+  # Theme aligned with your original
+  theme_bw() +
+  
+  labs(
+    x = "Test Temperature (°C)",
+    y = "MMR (µmol O₂/g/min)",
+    color = "Acclimation Temperature (°C)",
+    fill = "Acclimation Temperature (°C)"
+  ) +
+  
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth = 1.2),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 14),
+    axis.ticks.length = unit(0.2, "cm"),
+    axis.ticks = element_line(linewidth = 0.8),
+    strip.text = element_text(size = 14),
+    legend.title = element_text(size = 14),
+    theme(legend.position = "bottom",
+    legend.box.just = "right")
+  )
+
+plot(MMR)
+```
+
+Saving photo
+```{r}
+ggsave(
+  filename = "MMR.png",
+  plot = MMR,
+  width = 8,
+  height = 4,
+  dpi = 300
+)
+```
+
+aerobic scope
+```{r}
+AS <- ggplot(
+  df_respirometry_data,
+  aes(
+    x = test_temperature_c,
+    y = aerobic_scope_umol_o2_min_g,
+    color = acclimation_temperature_c
+  )
+) +
+  
+  # Mean points
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    position = position_dodge(width = 0.3),
+    size = 3
+  ) +
+  
+  # Error bars (SE)
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    position = position_dodge(width = 0.3),
+    width = 0.15
+  ) +
+  
+  # Raw data
+  geom_jitter(
+    aes(fill = acclimation_temperature_c),
+    position = position_jitterdodge(
+      dodge.width = 0.3,
+      jitter.width = 0.15
+    ),
+    alpha = 0.7,
+    size = 2,
+    shape = 21
+  ) +
+  
+  # Match your color palette
+  scale_fill_manual(
+    values = c(
+      "10" = "#6BAED6",
+      "24" = "#FB6A4A"
+    )
+  ) +
+  scale_color_manual(
+    values = c(
+      "10" = "black",
+      "24" = "black"
+    )
+  ) +
+  
+  # Facets (same as your boxplot)
+  facet_wrap(
+    ~ acclimation_salinity_ppt,
+    labeller = labeller(
+      acclimation_salinity_ppt = c(
+        "11" = "Isosmotic (11 ppt)",
+        "28" = "Brackish (28 ppt)"
+      )
+    )
+  ) +
+  
+  # Theme aligned with your original
+  theme_bw() +
+  
+  labs(
+    x = "Test Temperature (°C)",
+    y = "Aerobic Scope (µmol O₂/g/min)",
+    color = "Acclimation Temperature (°C)",
+    fill = "Acclimation Temperature (°C)"
+  ) +
+  
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth = 1.2),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 14),
+    axis.ticks.length = unit(0.2, "cm"),
+    axis.ticks = element_line(linewidth = 0.8),
+    strip.text = element_text(size = 14),
+    legend.title = element_text(size = 14),
+    theme(legend.position = "bottom",
+    legend.box.just = "right")
+  )
+
+plot(AS)
+```
+
+Saving photo
+```{r}
+ggsave(
+  filename = "AS.png",
+  plot = AS,
+  width = 8,
+  height = 4,
+  dpi = 300
+)
+```
+
+Combined RMR/MMR/AS figure (shared y-axis, single legend)
+```{r}
+# Strip the individual y-axis titles (and legends) from each plot so they
+# don't repeat in the combined figure - a shared axis label is added after.
+RMR_combo <- RMR + labs(y = NULL)
+MMR_combo <- MMR + labs(y = NULL)
+AS_combo  <- AS  + labs(y = NULL)
+
+combined_metabolic <- ggarrange(
+  RMR_combo, MMR_combo, AS_combo,
+  ncol = 3,
+  nrow = 1,
+  common.legend = TRUE,
+  legend = "bottom",
+  labels = c("A", "B", "C")
+)
+
+combined_metabolic <- annotate_figure(
+  combined_metabolic,
+  left = text_grob(
+    "Mass specific metabolic rate (\u00b5mol O\u2082/min/g)",
+    rot = 90,
+    size = 14
+  )
+)
+
+plot(combined_metabolic)
+```
+
+Saving combined figure
+```{r}
+ggsave(
+  filename = "Combined_Metabolic_Rates.png",
+  plot = combined_metabolic,
+  width = 12,
+  height =6,
+  dpi = 300
+)
+```
